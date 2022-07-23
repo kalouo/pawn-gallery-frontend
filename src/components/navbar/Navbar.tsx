@@ -1,3 +1,8 @@
+import styled from "styled-components";
+
+const NavbarContainer = styled.div`
+`;
+
 export const Navbar = () => {
-  return <div>"Navbar"</div>;
+  return <NavbarContainer>FOO</NavbarContainer>;
 };
