@@ -1,11 +1,16 @@
-import styles from './Navbar.module.css';
+// import styles from './Navbar.module.css';
+import styled from 'styled-components';
+
+const NavbarContainer = styled.div`
+  color: ${(props) => props.theme.red};
+`;
 
 const Navbar = () => {
   return (
-    <div className={styles.navbarContainer}>
-      <div className={styles.containerLeft}> LEFT </div>
-      <div className={styles.containerRight}>  RIGHT </div>
-    </div>
+    <NavbarContainer>
+      <div> LEFT </div>
+      <div> RIGHT </div>
+    </NavbarContainer>
   );
 };
 
