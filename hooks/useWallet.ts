@@ -6,7 +6,7 @@ import { notifyError } from 'utils/notifier';
 export function useWallet() {
   const { wallet } = useTezosContext();
 
-  const [initialized, setInitialized] = useState(false);
+  const [initialized, setInitialized] = useState<boolean>(false);
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -20,7 +20,6 @@ export function useWallet() {
         setInitialized(true);
         setAddress(response.address);
       } catch (error) {
-        notifyError('ERROR', 'Could not connect to wallet.');
       } finally {
         setLoading(false);
       }

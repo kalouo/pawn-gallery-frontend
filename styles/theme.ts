@@ -1,3 +1,5 @@
 export const theme = () => ({
-  red: 'red',
+  colors: {
+    WHITE: '#FFFFFF',
+  },
 });
