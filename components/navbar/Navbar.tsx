@@ -1,45 +1,57 @@
-// import styles from './Navbar.module.css';
 import styled from 'styled-components';
+import Link from 'next/link';
 
+import ConnectionButton from './ConnectionButton';
 import { useWallet } from 'hooks/useWallet';
-import { shortenAddress } from 'utils/address';
 
 const NavbarContainer = styled.div`
   height: 11vh;
-  border-bottom: ${(props) => props.theme.colors.WHITE} 1px solid;
+  border-bottom: ${(props) => props.theme.colors.MEDIUMGRAY} 1px solid;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  padding: 0px 75px;
 
   .left {
+    font-size: 36px;
+  }
+
+  .menu {
+    width: 100%;
+    padding: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    > a {
+      margin-right: 25px;
+    }
   }
 
   .right {
   }
 `;
 
-const ConnectionButton = styled.div`
-  color: ${(props) => props.theme.colors.WHITE}};
-  border: 1px solid ${(props) => props.theme.colors.WHITE}};
-  padding: 7.5px;
-  cursor: pointer;
-  white-space: nowrap;
-  :hover {
-    background-color: gray;
-  }
-`;
-
 const Navbar = () => {
-  const { initialized, address, connect, disconnect } = useWallet();
+  const { address, connect, disconnect } = useWallet();
 
   return (
     <NavbarContainer>
-      <div className="left"> </div>
+      <div className="left"> PAWN.GALLERY </div>
+      <div className="menu">
+        <Link href="/borrow">
+          <a>BORROW</a>
+        </Link>
+        <Link href="/lend">
+          <a>LEND</a>
+        </Link>
+      </div>
+
       <div className="right">
-        <ConnectionButton onClick={() => (initialized ? disconnect() : connect())}>
-          {initialized ? `ꜩ ${shortenAddress(address)}` : 'CONNECT'}
-        </ConnectionButton>
+        <ConnectionButton
+          address={address}
+          handleClick={() => (address ? disconnect() : connect())}
+        />
       </div>
     </NavbarContainer>
   );

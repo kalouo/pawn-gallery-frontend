@@ -16,8 +16,9 @@
     "@taquito/taquito": "^13.0.1",
     "@types/styled-components": "^5.1.25",
     "next": "12.2.3",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-identicons": "^1.2.5",
     "react-notifications-component": "^4.0.1",
     "styled-components": "^5.3.5"
   },
