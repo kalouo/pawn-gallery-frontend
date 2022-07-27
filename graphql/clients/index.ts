@@ -1,0 +1,1 @@
+export { useTeztokClient } from './teztok';
