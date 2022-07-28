@@ -33,8 +33,8 @@ const ConnectionButtonContainer = styled.div<{ initialized: boolean }>`
 `;
 
 type Props = {
-  address: string;
-  handleClick: () => {};
+  address?: string;
+  handleClick: () => void;
 };
 
 const ConnectionButton = ({ handleClick, address }: Props) => {

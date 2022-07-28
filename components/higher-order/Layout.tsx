@@ -1,14 +1,14 @@
 import { Navbar } from 'components/navbar';
 
-interface ViewProps {
+interface LayoutProps {
   children: React.ReactNode | React.ReactNode[];
 }
 
-const View = ({ children }: ViewProps) => (
+const Layout = ({ children }: LayoutProps) => (
   <>
     <Navbar />
     {children}
   </>
 );
 
-export default View;
+export default Layout;
