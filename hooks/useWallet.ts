@@ -26,7 +26,6 @@ export function useWallet() {
           network: { type: NetworkType.MAINNET },
         });
         setInitialized(true);
-        console.log('Setting address', response.address);
         setAddress(response.address);
       } catch (error) {
       } finally {
