@@ -18,8 +18,11 @@ const AssetCardContainer = styled.div`
 
   .image {
     border: 1px solid white;
+    position: relative;
     width: 240px;
     height: 300px;
+    max-width: 240px;
+    max-height: 300px;
     object-fit: contain;
     overflow: hidden;
   }
@@ -52,7 +55,7 @@ const AssetCard = ({ thumbnailUri, tokenAddress, tokenId, name, platform }: Prop
   return (
     <AssetCardContainer onClick={handleClick}>
       <div className="image">
-        <Image width={240} height={300} src={src} />
+        <Image layout="fill" src={src} />
       </div>
       <div className="info">
         <span>{name}</span>
