@@ -1,6 +1,20 @@
 import { gql } from 'graphql-request';
+import useSWR from 'swr';
+import { requestor } from '.';
 
-export const ALL_USER_ASSETS_QUERY = gql`
+export const queryToken = (args: Record<string, unknown>) => {
+  return constructQuery(TOKEN_QUERY, args)();
+};
+
+export const queryUserAssets = (args: Record<string, unknown>) => {
+  return constructQuery(ALL_USER_ASSETS_QUERY, args)();
+};
+
+const constructQuery = (query: string, args: Record<string, unknown>) => {
+  return () => useSWR([query, args], requestor);
+};
+
+const ALL_USER_ASSETS_QUERY = gql`
   query Holdings($address: String!) {
     holdings(
       where: {
@@ -19,6 +33,17 @@ export const ALL_USER_ASSETS_QUERY = gql`
         thumbnail_uri
         platform
       }
+    }
+  }
+`;
+
+const TOKEN_QUERY = gql`
+  query Token($tokenAddress: String!, $tokenId: String!) {
+    tokens(where: { fa2_address: { _eq: $tokenAddress }, token_id: { _eq: $tokenId } }) {
+      name
+      description
+      platform
+      thumbnail_uri
     }
   }
 `;

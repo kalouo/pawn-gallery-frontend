@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { requestor } from 'graphql/teztok';
 import { useWallet } from 'hooks/useWallet';
 
-import { ALL_USER_ASSETS_QUERY } from 'graphql/teztok/queries';
+import { queryUserAssets } from 'graphql/teztok/queries';
 import AssetCard from 'components/AssetCard';
 import styled from 'styled-components';
 
@@ -18,7 +18,8 @@ const BorrowContainer = styled.div`
 const Borrow: NextPage = () => {
   const { address, initialized } = useWallet();
 
-  const { data, error } = useSWR([ALL_USER_ASSETS_QUERY, { address }], requestor);
+  const { data, error } = queryUserAssets({ address });
+
   return (
     <BorrowContainer>
       {data?.holdings?.map((asset: { [key: string]: any }, index: number) => (
