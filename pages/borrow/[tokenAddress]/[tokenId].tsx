@@ -1,76 +1,36 @@
-import type { NextPage } from 'next';
+import { ExclamationCircleIcon } from '@heroicons/react/solid';
+import { joiResolver } from '@hookform/resolvers/joi';
+import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
-
-import styled from 'styled-components';
+import { useState } from 'react';
+import Image from 'next/image';
+import Joi from 'joi';
+import type { NextPage } from 'next';
 
 import { queryToken } from 'graphql/teztok/queries';
-import Image from 'next/image';
-import { useState } from 'react';
+import InputField from 'components/InputField';
 
-const BorrowFormContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  padding: 25px 75px;
+interface IFormInputs {
+  loanAmount: string;
+}
 
-  .container {
-    height: 500px;
-    width: 100%;
-    margin: 5px;
-    background-color: ${(props) => props.theme.colors.DARKGRAY};
-  }
-
-  .left { 
-    display: flex; 
-    justify-content: center; 
-    flex-direction: column;
-    align-items: center;
-    padding: 40px;
-  }
-
-  .right {
-    display: flex; 
-    flex-direction: column; 
-  }
-
-  .image {
-    position: relative;
-    width: 90%;
-    height: 90%;
-    
-    object-fit: contain;
-    overflow: scroll;
-  }
-
-  .header {
-    font-size: 24px;
-    margin-left: 10px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-
-  .parameter-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .parameter-name {
-    width: 200px;
-    min-height: 75px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    margin: 10px;
-    margin-left: 20px;
-    font-size: 18px;
-  }
-
-`;
+const schema = Joi.object({
+  loanAmount: Joi.number().required(),
+});
 
 const currencies = [{ name: 'USDT' }, { name: 'EURL' }, { name: 'XTZ' }];
 
 const BorrowForm: NextPage = () => {
+  const {
+    register,
+    formState: { errors: formErrors },
+    handleSubmit,
+  } = useForm<IFormInputs>({
+    resolver: joiResolver(schema),
+  });
+
+  const onSubmit = (data: IFormInputs) => console.log(data);
+
   const router = useRouter();
 
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
@@ -82,37 +42,41 @@ const BorrowForm: NextPage = () => {
   const src = token?.thumbnail_uri?.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
   return (
-    <BorrowFormContainer>
-      <div className="container left">
-        <div className="image">
-          {<Image layout="responsive" width={200} height={200} src={src} />}
+    <div className="p-12">
+      <div className="md:grid md:grid-cols-3 md:gap-6">
+        <div className="md:col-span-1">
+          <div className="px-4 sm:px-0">
+            {<Image layout="responsive" width={200} height={200} src={src} />}
+          </div>
         </div>
-        <div>
-          <div>{token?.name}</div>
-          <div>{token?.platform}</div>
+        <div className="mt-5 md:mt-0 md:col-span-2">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="shadow overflow-hidden sm:rounded-md">
+              <div className="px-4 py-5 bg-black sm:p-6">
+                <div className="flex justify-between	">
+                  <div> Loan Amount </div>
+                  <InputField
+                    register={register}
+                    rules={{ required: true }}
+                    type="number"
+                    name="loanAmount"
+                    errors={formErrors}
+                  ></InputField>
+                </div>
+              </div>
+              <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                <button
+                  type="submit"
+                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
-
-      <div className="container right">
-        <div className="header"> Loan Request </div>
-
-        <div className="parameter-container">
-          <div className="parameter-name"> Loan Currency </div>
-        </div>
-
-        <div className="parameter-container">
-          <div className="parameter-name"> Loan Amount </div>
-        </div>
-
-        <div className="parameter-container">
-          <div className="parameter-name"> Loan Duration </div>
-        </div>
-
-        <div className="parameter-container">
-          <div className="parameter-name"> Interest Rate </div>
-        </div>
-      </div>
-    </BorrowFormContainer>
+    </div>
   );
 };
 
