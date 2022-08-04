@@ -1,54 +1,23 @@
-import styled from 'styled-components';
-//@ts-expect-error: no-implicit-any
-import Identicon from 'react-identicons';
-
-import { shortenAddress } from 'utils/address';
-
-const ConnectionButtonContainer = styled.div<{ initialized: boolean }>`
-  color:  ${(props) => props.theme.colors.MEDIUMGRAY};
-  border: 1px solid ${(props) => props.theme.colors.MEDIUMGRAY}};
-  padding: 10px;
-  min-width: 160px;
-  max-height: 40px;
-  display: flex;
-  flex-direction: row;
-  justify-content: ${(props) => (props.initialized ? 'start' : 'center')};
-  align-items: center;
-  cursor: pointer;
-  white-space: nowrap;
-  :hover {
-    color:  ${(props) => props.theme.colors.WHITE};
-    border-color: ${(props) => props.theme.colors.WHITE};
-  }
-  .identicon {
-    height: 28px !important;
-    width: 28px !important;
-    border-radius: 50%;
-    margin-right: 18px;
-  }
-  .text {
-    display: flex; 
-    align-items: center;
-  }
-`;
+import { UserCircleIcon } from '@heroicons/react/solid';
 
 type Props = {
-  address?: string;
   handleClick: () => void;
 };
 
-const ConnectionButton = ({ handleClick, address }: Props) => {
+const ConnectionButton = ({ handleClick }: Props) => {
   return (
-    <ConnectionButtonContainer initialized={Boolean(address)} onClick={handleClick}>
-      {address ? (
-        <>
-          <Identicon string={address} className="identicon"></Identicon>
-          <div className="text"> {shortenAddress(address)}</div>
-        </>
-      ) : (
-        <div className="text">CONNECT WALLET</div>
-      )}
-    </ConnectionButtonContainer>
+    <>
+      <button
+        onClick={handleClick}
+        type="button"
+        className="hidden sm:inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        <UserCircleIcon className="-ml-0.5 mr-2 h-4 w-4" aria-hidden="true" />
+        <span>CONNECT WALLET</span>
+      </button>
+
+      <UserCircleIcon onClick={handleClick} className="sm:hidden h-8 w-8" aria-hidden="true" />
+    </>
   );
 };
 

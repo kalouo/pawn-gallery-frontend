@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 
 import GlobalStyle from 'styles/global-style';
 
+import 'styles/globals.css';
 import 'react-notifications-component/dist/theme.css';
 import { Layout } from 'components/higher-order';
 
