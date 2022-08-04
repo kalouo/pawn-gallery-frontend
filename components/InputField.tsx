@@ -9,6 +9,7 @@ type Props = {
   register: UseFormRegister<any>;
   errors: { [key: string]: { message?: string } };
   placeholder?: string;
+  label?: string;
   additionalClasses?: string;
 };
 
@@ -20,16 +21,20 @@ const InputField = ({
   placeholder,
   rules,
   type,
+  label,
 }: Props) => {
   return (
     <div>
+      <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        {label}
+      </label>
       <div className="mt-1 relative rounded-md shadow-sm">
         <input
           {...register(name, rules)}
           id={name}
           placeholder={placeholder}
           type={type}
-          className={`text-black shadow-sm focus:ring-transparent focus:border-transparent block w-full sm:text-sm rounded-md ${additionalClasses}`}
+          className={`appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${additionalClasses}`}
         />
         {errors[name]?.message ? (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">

@@ -18,13 +18,11 @@ a {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: 
+  ) {
   html {
-    color-scheme: dark;
   }
   body {
-    color: white;
-    background: black;
   }
 }
 `;
