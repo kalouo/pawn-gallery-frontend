@@ -5,7 +5,6 @@ import { sentenceCase } from 'change-case';
 type Props = {
   type: string;
   name: string;
-  rules: { [key: string]: any };
   register: UseFormRegister<any>;
   errors: { [key: string]: { message?: string } };
   placeholder?: string;
@@ -19,7 +18,6 @@ const InputField = ({
   errors,
   name,
   placeholder,
-  rules,
   type,
   label,
 }: Props) => {
@@ -30,7 +28,7 @@ const InputField = ({
       </label>
       <div className="mt-1 relative rounded-md shadow-sm">
         <input
-          {...register(name, rules)}
+          {...register(name)}
           id={name}
           placeholder={placeholder}
           type={type}
