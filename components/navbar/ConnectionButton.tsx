@@ -15,13 +15,8 @@ const ConnectionButton = ({ handleClick }: Props) => {
         <UserCircleIcon className="-ml-0.5 mr-2 h-4 w-4" aria-hidden="true" />
         <span>CONNECT WALLET</span>
       </button>
-      <button
-        onClick={handleClick}
-        type="button"
-        className="sm:hidden flex items-center px-2 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
-        <UserCircleIcon className="h-6 w-6" aria-hidden="true" />
-      </button>
+
+      <UserCircleIcon onClick={handleClick} className="sm:hidden h-8 w-8" aria-hidden="true" />
     </>
   );
 };
