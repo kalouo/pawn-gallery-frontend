@@ -7,14 +7,14 @@ export default function PleaseConnect() {
         <main className="flex-grow flex flex-col justify-center max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex-shrink-0 flex justify-center">
             <Link href="/">
-              <div className="inline-flex">
+              <a className="inline-flex">
                 <span className="sr-only">Workflow</span>
                 <img
                   className="h-12 w-auto"
                   src="https://tailwindui.com/img/logos/workflow-mark.svg?color=indigo&shade=600"
                   alt=""
                 />
-              </div>
+              </a>
             </Link>
           </div>
           <div className="py-16">
@@ -24,9 +24,9 @@ export default function PleaseConnect() {
               </h1>
               <div className="mt-6">
                 <Link href="/">
-                  <div className="text-base font-medium text-indigo-600 hover:text-indigo-500">
+                  <a className="text-base font-medium text-indigo-600 hover:text-indigo-500">
                     Go back home<span aria-hidden="true"> &rarr;</span>
-                  </div>
+                  </a>
                 </Link>
               </div>
             </div>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { NextPage } from 'next';
 
 import { queryUserAssets } from 'graphql/teztok/queries';
@@ -31,10 +32,12 @@ const Borrow: NextPage = () => {
                 <div className="mt-4 flex justify-between">
                   <div>
                     <h3 className="text-sm text-gray-700">
-                      <a href={`borrow/${asset?.token?.fa2_address}/${asset?.token?.token_id}`}>
-                        <span aria-hidden="true" className="absolute inset-0" />
-                        {asset?.token?.name}
-                      </a>
+                      <Link href={`borrow/${asset?.token?.fa2_address}/${asset?.token?.token_id}`}>
+                        <a>
+                          <span aria-hidden="true" className="absolute inset-0" />
+                          {asset?.token?.name}
+                        </a>
+                      </Link>
                     </h3>
                   </div>
                   <p className="text-sm font-medium text-gray-900">{asset?.token?.platform}</p>
