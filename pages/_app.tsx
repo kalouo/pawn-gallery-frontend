@@ -14,6 +14,9 @@ import 'styles/globals.css';
 import 'react-notifications-component/dist/theme.css';
 import { Layout } from 'components/higher-order';
 
+import { store } from 'store';
+import { Provider as StoreProvider } from 'react-redux';
+
 function MyApp({ Component, pageProps }: AppProps) {
   const [wallet, setWallet] = useState<BeaconWallet>();
   const [tezos, setTezos] = useState<TezosToolkit>();
@@ -31,15 +34,17 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, [wallet]);
 
   return (
-    <TezosContext.Provider value={{ tezos, wallet }}>
-      <ThemeProvider>
-        <GlobalStyle />
-        <ReactNotifications />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ThemeProvider>
-    </TezosContext.Provider>
+    <StoreProvider store={store}>
+      <TezosContext.Provider value={{ tezos, wallet }}>
+        <ThemeProvider>
+          <GlobalStyle />
+          <ReactNotifications />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ThemeProvider>
+      </TezosContext.Provider>
+    </StoreProvider>
   );
 }
 
