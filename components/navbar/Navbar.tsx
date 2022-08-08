@@ -12,8 +12,7 @@ const navigation = [
   { name: 'Lend', href: '/lend', current: false },
 ];
 
-// @ts-ignore
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 

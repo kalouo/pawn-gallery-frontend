@@ -4,8 +4,7 @@ import { Combobox } from '@headlessui/react';
 import Image from 'next/image';
 import { UseFormRegister } from 'react-hook-form';
 
-// @ts-ignore
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
@@ -63,7 +62,9 @@ export default function Selection({ list, label, register, name, rules }: Select
                         alt=""
                         className="h-6 w-6 flex-shrink-0 rounded-full"
                       />
-                      <span className={classNames('ml-3 truncate', selected && 'font-semibold')}>
+                      <span
+                        className={classNames('ml-3 truncate', selected ? 'font-semibold' : '')}
+                      >
                         {item.name}
                       </span>
                     </div>
