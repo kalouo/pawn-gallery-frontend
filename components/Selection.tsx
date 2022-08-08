@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid';
 import { Combobox } from '@headlessui/react';
-import Image from 'next/image';
 import { UseFormRegister } from 'react-hook-form';
 
 function classNames(...classes: string[]) {
@@ -13,7 +12,7 @@ interface SelectionProps {
   label: string;
   register: UseFormRegister<any>;
   name: string;
-  rules: { [key: string]: any };
+  rules: Record<string, unknown>;
 }
 
 export default function Selection({ list, label, register, name, rules }: SelectionProps) {
