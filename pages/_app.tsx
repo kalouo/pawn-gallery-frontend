@@ -1,5 +1,4 @@
 import type { AppProps } from 'next/app';
-import { ThemeProvider } from 'styles';
 
 import { TezosContext } from 'contexts/tezos';
 
@@ -7,8 +6,6 @@ import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { ReactNotifications } from 'react-notifications-component';
 import { useEffect, useState } from 'react';
-
-import GlobalStyle from 'styles/global-style';
 
 import 'styles/globals.css';
 import 'react-notifications-component/dist/theme.css';
@@ -36,13 +33,10 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <StoreProvider store={store}>
       <TezosContext.Provider value={{ tezos, wallet }}>
-        <ThemeProvider>
-          <GlobalStyle />
-          <ReactNotifications />
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </ThemeProvider>
+        <ReactNotifications />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </TezosContext.Provider>
     </StoreProvider>
   );
