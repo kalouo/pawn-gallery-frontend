@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import tezosReducer from './reducers/tezos';
+import web3Reducer from './reducers/web3';
 
 export const store = configureStore({
   reducer: {
-    tezos: tezosReducer,
+    web3: web3Reducer,
   },
 });
 
