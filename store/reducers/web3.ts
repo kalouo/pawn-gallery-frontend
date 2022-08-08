@@ -19,8 +19,4 @@ export const web3Slice = createSlice({
 
 export const { setAddress } = web3Slice.actions;
 
-export const selectAddress = (state: RootState) => {
-  return state.web3.address;
-};
-
 export default web3Slice.reducer;
