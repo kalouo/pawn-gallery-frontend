@@ -1,13 +1,10 @@
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
-
 //@ts-expect-error: no-implicit-any
 import Identicon from 'react-identicons';
 
-import { selectAddress } from 'store/selectors/web3';
-import { useAppSelector } from 'store/hooks';
-import { useWallet } from 'hooks/useWallet';
+import { useWeb3 } from 'hooks/useWeb3';
 import ConnectionButton from './ConnectionButton';
 
 const navigation = [
@@ -21,8 +18,7 @@ function classNames(...classes) {
 }
 
 export default function Example() {
-  const { connect, disconnect } = useWallet();
-  const address = useAppSelector(selectAddress);
+  const { address, connect, disconnect } = useWeb3();
 
   return (
     <Disclosure as="nav" className="bg-gray-800">

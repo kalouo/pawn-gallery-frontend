@@ -1,10 +1,9 @@
 import PleaseConnect from 'components/PleaseConnect';
+import { useWeb3 } from 'hooks/useWeb3';
 import type { NextPage } from 'next';
-import { useAppSelector } from 'store/hooks';
-import { selectAddress } from 'store/selectors/web3';
 
 const Lend: NextPage = () => {
-  const address = useAppSelector(selectAddress);
+  const { address } = useWeb3();
   return address ? <div>LENDING</div> : <PleaseConnect />;
 };
 

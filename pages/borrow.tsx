@@ -1,12 +1,11 @@
 import type { NextPage } from 'next';
 
 import { queryUserAssets } from 'graphql/teztok/queries';
-import { useAppSelector } from 'store/hooks';
-import { selectAddress } from 'store/selectors/web3';
 import PleaseConnect from 'components/PleaseConnect';
+import { useWeb3 } from 'hooks/useWeb3';
 
 const Borrow: NextPage = () => {
-  const address = useAppSelector(selectAddress);
+  const { address } = useWeb3();
 
   const { data, error } = queryUserAssets({ address });
 
