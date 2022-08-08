@@ -1,14 +1,16 @@
 import type { NextPage } from 'next';
 
 import { queryUserAssets } from 'graphql/teztok/queries';
-import { useWallet } from 'hooks/useWallet';
+import { useAppSelector } from 'store/hooks';
+import { selectAddress } from 'store/selectors/web3';
+import PleaseConnect from 'components/PleaseConnect';
 
 const Borrow: NextPage = () => {
-  const { address, initialized } = useWallet();
+  const address = useAppSelector(selectAddress);
 
   const { data, error } = queryUserAssets({ address });
 
-  return (
+  return address ? (
     <div className="bg-white">
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">Your Collection</h2>
@@ -44,6 +46,8 @@ const Borrow: NextPage = () => {
         </div>
       </div>
     </div>
+  ) : (
+    <PleaseConnect />
   );
 };
 
