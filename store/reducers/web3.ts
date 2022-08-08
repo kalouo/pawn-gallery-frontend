@@ -7,18 +7,20 @@ interface Web3State {
 
 const initialState: Web3State = {};
 
-export const counterSlice = createSlice({
+export const web3Slice = createSlice({
   name: 'web3',
   initialState,
-  reducers: {},
+  reducers: {
+    setAddress: (state: Web3State, action: PayloadAction<string>) => {
+      state.address = action.payload;
+    },
+  },
 });
 
-export const setAddress = (state: Web3State, action: PayloadAction<string>) => {
-  state.address = action.payload;
-};
+export const { setAddress } = web3Slice.actions;
 
 export const selectAddress = (state: RootState) => {
   return state.web3.address;
 };
 
-export default counterSlice.reducer;
+export default web3Slice.reducer;
