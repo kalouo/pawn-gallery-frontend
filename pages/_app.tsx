@@ -1,5 +1,4 @@
 import type { AppProps } from 'next/app';
-import { ThemeProvider } from 'styles';
 
 import { TezosContext } from 'contexts/tezos';
 
@@ -8,11 +7,12 @@ import { BeaconWallet } from '@taquito/beacon-wallet';
 import { ReactNotifications } from 'react-notifications-component';
 import { useEffect, useState } from 'react';
 
-import GlobalStyle from 'styles/global-style';
-
 import 'styles/globals.css';
 import 'react-notifications-component/dist/theme.css';
 import { Layout } from 'components/higher-order';
+
+import { store } from 'store';
+import { Provider as StoreProvider } from 'react-redux';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [wallet, setWallet] = useState<BeaconWallet>();
@@ -31,15 +31,14 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, [wallet]);
 
   return (
-    <TezosContext.Provider value={{ tezos, wallet }}>
-      <ThemeProvider>
-        <GlobalStyle />
+    <StoreProvider store={store}>
+      <TezosContext.Provider value={{ tezos, wallet }}>
         <ReactNotifications />
         <Layout>
           <Component {...pageProps} />
         </Layout>
-      </ThemeProvider>
-    </TezosContext.Provider>
+      </TezosContext.Provider>
+    </StoreProvider>
   );
 }
 

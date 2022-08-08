@@ -1,14 +1,16 @@
+import Link from 'next/link';
 import type { NextPage } from 'next';
 
 import { queryUserAssets } from 'graphql/teztok/queries';
-import { useWallet } from 'hooks/useWallet';
+import PleaseConnect from 'components/PleaseConnect';
+import { useWeb3 } from 'hooks/useWeb3';
 
 const Borrow: NextPage = () => {
-  const { address, initialized } = useWallet();
+  const { address } = useWeb3();
 
   const { data, error } = queryUserAssets({ address });
 
-  return (
+  return address ? (
     <div className="bg-white">
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">Your Collection</h2>
@@ -30,10 +32,12 @@ const Borrow: NextPage = () => {
                 <div className="mt-4 flex justify-between">
                   <div>
                     <h3 className="text-sm text-gray-700">
-                      <a href={`borrow/${asset?.token?.fa2_address}/${asset?.token?.token_id}`}>
-                        <span aria-hidden="true" className="absolute inset-0" />
-                        {asset?.token?.name}
-                      </a>
+                      <Link href={`borrow/${asset?.token?.fa2_address}/${asset?.token?.token_id}`}>
+                        <a>
+                          <span aria-hidden="true" className="absolute inset-0" />
+                          {asset?.token?.name}
+                        </a>
+                      </Link>
                     </h3>
                   </div>
                   <p className="text-sm font-medium text-gray-900">{asset?.token?.platform}</p>
@@ -44,6 +48,8 @@ const Borrow: NextPage = () => {
         </div>
       </div>
     </div>
+  ) : (
+    <PleaseConnect />
   );
 };
 

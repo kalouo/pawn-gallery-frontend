@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid';
 import { Combobox } from '@headlessui/react';
-import Image from 'next/image';
 import { UseFormRegister } from 'react-hook-form';
 
-// @ts-ignore
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
@@ -14,7 +12,7 @@ interface SelectionProps {
   label: string;
   register: UseFormRegister<any>;
   name: string;
-  rules: { [key: string]: any };
+  rules: Record<string, unknown>;
 }
 
 export default function Selection({ list, label, register, name, rules }: SelectionProps) {
@@ -63,7 +61,9 @@ export default function Selection({ list, label, register, name, rules }: Select
                         alt=""
                         className="h-6 w-6 flex-shrink-0 rounded-full"
                       />
-                      <span className={classNames('ml-3 truncate', selected && 'font-semibold')}>
+                      <span
+                        className={classNames('ml-3 truncate', selected ? 'font-semibold' : '')}
+                      >
                         {item.name}
                       </span>
                     </div>
