@@ -1,8 +1,7 @@
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
-//@ts-expect-error: no-implicit-any
-import Identicon from 'react-identicons';
+import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 
 import { useWeb3 } from 'hooks/useWeb3';
 import ConnectionButton from './ConnectionButton';
@@ -85,11 +84,10 @@ export default function Example() {
                       <div>
                         <Menu.Button className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                           <span className="sr-only">Open user menu</span>
-                          <Identicon
-                            size={32}
-                            className="h-8 w-8 rounded-full bg-indigo-500"
-                            string={address}
-                          ></Identicon>
+
+                          <div className="h-8 w-8 rounded-full bg-indigo-500">
+                            <Jazzicon diameter={32} seed={jsNumberForAddress(address)} />
+                          </div>
                         </Menu.Button>
                       </div>
                       <Transition
