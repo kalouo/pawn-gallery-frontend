@@ -41,6 +41,7 @@
     "*.{ts,tsx,js,jsx}": "npx prettier . --write"
   },
   "devDependencies": {
+    "@taqueria/plugin-contract-types": "^0.10.0",
     "@types/lodash": "^4.14.182",
     "@types/node": "18.0.6",
     "@types/react": "18.0.15",

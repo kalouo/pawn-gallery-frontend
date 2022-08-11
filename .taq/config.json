@@ -1,0 +1,16 @@
+{
+    "language": "en",
+    "plugins": [
+        {
+            "name": "@taqueria/plugin-contract-types",
+            "type": "npm"
+        }
+    ],
+    "contractsDir": "contracts",
+    "artifactsDir": "contracts/build",
+    "accounts": {
+        "bob": "5_000_000_000",
+        "alice": "5_000_000_000",
+        "john": "5_000_000_000"
+    }
+}
