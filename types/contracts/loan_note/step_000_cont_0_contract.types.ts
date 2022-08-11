@@ -1,6 +1,6 @@
 
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
-import { address, BigMap, bytes, contract, MMap, nat, unit } from './type-aliases';
+import { address, BigMap, bytes, contract, MMap, nat, unit } from '../../type-aliases';
 
 type Storage = {
     administrator: address;

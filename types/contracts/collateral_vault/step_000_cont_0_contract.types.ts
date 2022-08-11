@@ -1,6 +1,6 @@
 
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
-import { address, BigMap, nat } from './type-aliases';
+import { address, BigMap, nat } from '../../type-aliases';
 
 type Storage = {
     deposits: BigMap<nat, {

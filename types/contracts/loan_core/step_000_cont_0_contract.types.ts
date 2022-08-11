@@ -1,6 +1,6 @@
 
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
-import { address, BigMap, int, nat, timestamp } from './type-aliases';
+import { address, BigMap, int, nat, timestamp } from '../../type-aliases';
 
 type Storage = {
     borrower_note_address: address;
