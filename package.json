@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "prettier": "npx prettier . --write",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "update-contracts": "chmod +x ./updateContracts.sh && ./updateContracts.sh "
   },
   "dependencies": {
     "@airgap/beacon-sdk": "^3.1.3",
