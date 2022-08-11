@@ -9,7 +9,8 @@
     "lint": "next lint",
     "prettier": "npx prettier . --write",
     "prepare": "husky install",
-    "update-contracts": "chmod +x ./updateContracts.sh && ./updateContracts.sh "
+    "update-contracts": "chmod +x ./updateContracts.sh && ./updateContracts.sh",
+    "setup-sandbox": "ts-node ./setup-sandbox.ts"
   },
   "dependencies": {
     "@airgap/beacon-sdk": "^3.1.3",
@@ -55,6 +56,7 @@
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
     "typescript": "4.7.4"
   }
 }
