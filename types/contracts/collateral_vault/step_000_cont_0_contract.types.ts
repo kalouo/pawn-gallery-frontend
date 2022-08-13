@@ -19,6 +19,7 @@ type Methods = {
         deposit_id: nat,
         depositor: address,
     ) => Promise<void>;
+    set_owner: (param: address) => Promise<void>;
     withdraw: (
         deposit_id: nat,
         recipient: address,
@@ -33,6 +34,7 @@ type MethodsObject = {
         deposit_id: nat,
         depositor: address,
     }) => Promise<void>;
+    set_owner: (param: address) => Promise<void>;
     withdraw: (params: {
         deposit_id: nat,
         recipient: address,
