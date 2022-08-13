@@ -1,7 +1,6 @@
 #! /bin/bash
 
 # Pull latest contracts from remote repository.
-echo -e "\xE2\x9C\x94"
 echo "Updating remote submodule ..."
 $(git submodule update --remote)
 
