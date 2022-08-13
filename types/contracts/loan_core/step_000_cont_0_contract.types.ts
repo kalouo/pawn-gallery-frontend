@@ -1,5 +1,5 @@
 
-import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
+import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from '../../type-utils';
 import { address, BigMap, int, nat, timestamp } from '../../type-aliases';
 
 type Storage = {
