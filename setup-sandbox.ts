@@ -70,7 +70,7 @@ const loadOriginations = () => {
 
   try {
     for (const operation of operations) {
-      console.log(operation.msg);
+      console.log('------', operation.msg);
       const tx = await operation.method(...operation.args).send();
       await tx.confirmation(1);
     }
@@ -92,6 +92,4 @@ const loadOriginations = () => {
 
   assert(await loanCoreStorage.permitted_currencies.get(test_currency.address));
   assert((await loanCoreStorage.currency_precision.get(test_currency.address)).eq(PRECISION));
-
-  console.log('✔ Pawn Sandbox is ready');
 })();
