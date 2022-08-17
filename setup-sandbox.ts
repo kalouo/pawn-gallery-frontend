@@ -1,62 +1,97 @@
 import { InMemorySigner } from '@taquito/signer';
 import { ContractMethod, ContractProvider, TezosToolkit } from '@taquito/taquito';
 import { assert } from 'console';
-import { BigNumber } from 'bignumber.js';
 
-import { LoanCore, LoanNote, CollateralVault, FA2Fungible } from 'contract-types';
-import { address } from 'types/type-aliases';
+import { LoanCore, BorrowerNote, LenderNote, CollateralVault } from 'contract-types';
 
 const PKEY = 'edsk3AiSAERPfe6yqS7Q4YAxBQ5L1NLUao2H9sP34x7u1tEkXB5bwX';
-
-const LOAN_CORE_ADDR = 'KT1UY1Dsv3M3XjeAJzhy4LU1afk2WudT7BUb';
-const COLLATERAL_VAULT_ADDR = 'KT1L3Htvug31QZ9KKqosxejzgWDsWm4gBQMt';
-const TEST_CURRENCY_ADDR = 'KT1UZTcu6erpnPt3bSmF5eDhy4MTuX1xDDX5' as address;
 const PRECISION = Math.pow(10, 18);
-// const TEST_NFT_ADDR = 'KT1Poh9nicJJCKFKeWn62uWxso63EZSRvVYU';
-// const BORROWER_NOTE_ADDR = 'KT1HjJeGHnQQyokL9Nr7ZouCt495w7hyY6SD';
+
+const loadOriginations = () => {
+  try {
+    const deployments = require('./contracts/build/chinstrap_deployments.json');
+    return deployments['chinstrap']['networks']['development'];
+  } catch (e) {
+    console.error('Chinstrap deployments file not found.');
+  }
+};
 
 (async () => {
   const signer = await InMemorySigner.fromSecretKey(PKEY);
   const Tezos = new TezosToolkit('http://localhost:20000');
   Tezos.setProvider({ signer: signer });
 
-  // const borrowerNote = await Tezos.contract.at<LoanNote>(LOAN_NOTE_ADDR);
-  const loanCore = await Tezos.contract.at<LoanCore>(LOAN_CORE_ADDR);
-  const collateralVault = await Tezos.contract.at<CollateralVault>(COLLATERAL_VAULT_ADDR);
-  const testCurrency = await Tezos.contract.at<FA2Fungible>(TEST_CURRENCY_ADDR);
+  const { loan_core, collateral_vault, lender_note, borrower_note, test_currency } =
+    loadOriginations();
+
+  const loanCore = await Tezos.contract.at<LoanCore>(loan_core.address);
+  const collateralVault = await Tezos.contract.at<CollateralVault>(collateral_vault.address);
+  const lenderNote = await Tezos.contract.at<LenderNote>(lender_note.address);
+  const borrowerNote = await Tezos.contract.at<BorrowerNote>(borrower_note.address);
+
+  const { set_collateral_vault, set_loan_note_contracts, whitelist_currency } = loanCore.methods;
 
   let operations: {
     method: (...args: any) => ContractMethod<ContractProvider>;
     args: any[];
+    msg: string;
   }[] = [
-    { method: loanCore.methods.set_collateral_vault, args: [collateralVault.address] },
-    { method: loanCore.methods.whitelist_currency, args: [TEST_CURRENCY_ADDR, PRECISION] },
-    // { method: loanCore.methods.set_loan_note_contracts, args: [] },
-
-    { method: collateralVault.methods.set_owner, args: [loanCore.address] },
+    {
+      method: set_collateral_vault,
+      args: [collateralVault.address],
+      msg: 'Setting collateral vault ...',
+    },
+    {
+      method: whitelist_currency,
+      args: [test_currency.address, PRECISION],
+      msg: 'Adding currency to the whitelist ...',
+    },
+    {
+      method: set_loan_note_contracts,
+      args: [borrower_note.address, lender_note.address],
+      msg: 'Setting loan note contracts ...',
+    },
+    {
+      method: collateralVault.methods.set_owner,
+      args: [loanCore.address],
+      msg: 'Setting collateral vault owner ...',
+    },
+    {
+      method: lenderNote.methods.set_administrator,
+      args: [loanCore.address],
+      msg: 'Setting lender note admin ...',
+    },
+    {
+      method: borrowerNote.methods.set_administrator,
+      args: [loanCore.address],
+      msg: 'Setting borrower note admin ...',
+    },
   ];
 
   try {
-    // for (const operation of operations) {
-    //   const tx = await operation.method(...operation.args).send();
-    //   await tx.confirmation(1);
-    // }
+    for (const operation of operations) {
+      console.log(operation.msg);
+      const tx = await operation.method(...operation.args).send();
+      await tx.confirmation(1);
+    }
   } catch (e) {
     console.error(e);
   }
 
   let loanCoreStorage = await loanCore.storage();
   let collateralVaultStorage = await collateralVault.storage();
+  let borrowerNoteStorage = await borrowerNote.storage();
+  let lenderNoteStorage = await lenderNote.storage();
 
-  // console.log(loanCoreStorage);
   assert(loanCoreStorage.collateral_vault_address === collateralVault.address);
-  assert(await loanCoreStorage.permitted_currencies.get(TEST_CURRENCY_ADDR));
-  assert((await loanCoreStorage.currency_precision.get(TEST_CURRENCY_ADDR)).eq(PRECISION));
-
+  assert(loanCoreStorage.lender_note_address === lenderNote.address);
+  assert(loanCoreStorage.borrower_note_address === borrowerNote.address);
   assert(collateralVaultStorage.owner === loanCore.address);
+  assert(borrowerNoteStorage.administrator === loanCore.address);
+  assert(lenderNoteStorage.administrator === loanCore.address);
 
-  /* Mint fungibles */
-  /* Mint non-fungibles */
-  /* Set lender and borrower note addresses */
-  /* Set lender and borrower note admin as loanCore */
+  assert(await loanCoreStorage.permitted_currencies.get(test_currency.address));
+  assert((await loanCoreStorage.currency_precision.get(test_currency.address)).eq(PRECISION));
+
+  console.log('✔ Pawn Sandbox is ready');
 })();
