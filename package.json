@@ -9,8 +9,8 @@
     "lint": "next lint",
     "prettier": "npx prettier . --write",
     "prepare": "husky install",
-    "update-contracts": "chmod +x ./updateContracts.sh && ./updateContracts.sh",
-    "setup-sandbox": "ts-node ./setup-sandbox.ts"
+    "update-types": "chmod +x ./update-types.sh && ./update-types.sh",
+    "setup-sandbox": "chmod +x ./setup-sandbox.sh && ./setup-sandbox.sh"
   },
   "dependencies": {
     "@airgap/beacon-sdk": "^3.1.3",
