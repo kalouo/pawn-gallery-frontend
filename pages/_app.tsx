@@ -1,6 +1,7 @@
 import type { AppProps } from 'next/app';
 
 import { TezosContext } from 'contexts/tezos';
+import { PawnContractsContext } from 'contexts/pawn-contracts';
 
 import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
@@ -13,6 +14,7 @@ import { Layout } from 'components/higher-order';
 
 import { store } from 'store';
 import { Provider as StoreProvider } from 'react-redux';
+import { loadContractAddresses } from 'utils/contracts';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [wallet, setWallet] = useState<BeaconWallet>();
@@ -33,10 +35,12 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <StoreProvider store={store}>
       <TezosContext.Provider value={{ tezos, wallet }}>
-        <ReactNotifications />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <PawnContractsContext.Provider value={loadContractAddresses()}>
+          <ReactNotifications />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </PawnContractsContext.Provider>
       </TezosContext.Provider>
     </StoreProvider>
   );
