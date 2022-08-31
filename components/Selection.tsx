@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid';
 import { Combobox } from '@headlessui/react';
 import { UseFormRegister } from 'react-hook-form';
+import { Currency } from 'contexts/tezos/types';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
 interface SelectionProps {
-  list: { name: string; id: string | number; imageUrl?: string }[];
+  list: Currency[];
   label: string;
   register: UseFormRegister<any>;
   name: string;
@@ -34,7 +35,7 @@ export default function Selection({ list, label, register, name, rules }: Select
           {...register(name, rules)}
           className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm appearance-none"
           onChange={(event) => setQuery(event.target.value)}
-          displayValue={(item) => (item as Record<'name', string>).name}
+          displayValue={(item: Currency) => item.symbol}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none appearance-none">
           <SelectorIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -42,9 +43,9 @@ export default function Selection({ list, label, register, name, rules }: Select
 
         {filteredList.length > 0 && (
           <Combobox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-            {filteredList.map((item) => (
+            {filteredList.map((item, index) => (
               <Combobox.Option
-                key={item.id}
+                key={`currency-list-item-${index}`}
                 value={item}
                 className={({ active }) =>
                   classNames(
@@ -57,7 +58,7 @@ export default function Selection({ list, label, register, name, rules }: Select
                   <>
                     <div className="flex items-center">
                       <img
-                        src={item.imageUrl}
+                        src={item.iconUrl}
                         alt=""
                         className="h-6 w-6 flex-shrink-0 rounded-full"
                       />

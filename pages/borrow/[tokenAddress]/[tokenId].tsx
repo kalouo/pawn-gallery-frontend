@@ -6,6 +6,7 @@ import Joi from 'joi';
 import { queryToken } from 'graphql/teztok/queries';
 import InputField from 'components/InputField';
 import Selection from 'components/Selection';
+import { useTezosContext } from 'contexts/tezos';
 
 interface IFormInputs {
   loanAmount: string;
@@ -16,12 +17,6 @@ const schema = Joi.object({
   loanInterest: Joi.number().required(),
   loanCurrency: Joi.string().required(),
 });
-
-const currencies = [
-  { name: 'XTZ', imageUrl: '/images/currencies/xtz.png' },
-  { name: 'USDT', imageUrl: '/images/currencies/usdt.png' },
-  { name: 'EURL', imageUrl: '/images/currencies/eurl.png' },
-];
 
 export default function Example() {
   const {
@@ -34,6 +29,7 @@ export default function Example() {
 
   const onSubmit = (data: IFormInputs) => console.log(data);
 
+  const { currencies } = useTezosContext();
   const router = useRouter();
 
   const { tokenAddress, tokenId } = router.query;
@@ -99,7 +95,7 @@ export default function Example() {
                     name="loanCurrency"
                     rules={{ required: true }}
                     label="Loan Currency"
-                    list={currencies.map((item, index) => ({ ...item, id: `ccy-${index}` }))}
+                    list={currencies ?? []}
                   ></Selection>
                 </div>
 
