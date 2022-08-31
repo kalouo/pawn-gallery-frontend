@@ -1,7 +1,6 @@
 import type { AppProps } from 'next/app';
 
-import { TezosContext } from 'contexts/tezos';
-import { PawnContractsContext } from 'contexts/pawn-contracts';
+import { Contracts, TezosContext } from 'contexts/tezos';
 
 import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
@@ -19,28 +18,29 @@ import { loadContractAddresses } from 'utils/contracts';
 function MyApp({ Component, pageProps }: AppProps) {
   const [wallet, setWallet] = useState<BeaconWallet>();
   const [tezos, setTezos] = useState<TezosToolkit>();
+  const [contracts, setContracts] = useState<Contracts>();
 
   useEffect(() => {
     (async () => {
       if (!wallet) {
         const _wallet = new BeaconWallet({ name: 'pawn.gallery' });
         const _tezos = new TezosToolkit('https://mainnet.smartpy.io');
+        const _contracts = loadContractAddresses();
 
         setWallet(_wallet);
         setTezos(_tezos);
+        setContracts(_contracts);
       }
     })();
   }, [wallet]);
 
   return (
     <StoreProvider store={store}>
-      <TezosContext.Provider value={{ tezos, wallet }}>
-        <PawnContractsContext.Provider value={loadContractAddresses()}>
-          <ReactNotifications />
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </PawnContractsContext.Provider>
+      <TezosContext.Provider value={{ tezos, wallet, contracts }}>
+        <ReactNotifications />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </TezosContext.Provider>
     </StoreProvider>
   );

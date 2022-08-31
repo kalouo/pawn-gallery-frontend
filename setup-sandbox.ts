@@ -2,7 +2,13 @@ import { InMemorySigner } from '@taquito/signer';
 import { ContractMethod, ContractProvider, TezosToolkit } from '@taquito/taquito';
 import { assert } from 'console';
 
-import { LoanCore, BorrowerNote, LenderNote, CollateralVault } from 'contract-types';
+import {
+  LoanCore,
+  BorrowerNote,
+  LenderNote,
+  CollateralVault,
+  OriginationController,
+} from 'contract-types';
 
 const PKEY = 'edsk3AiSAERPfe6yqS7Q4YAxBQ5L1NLUao2H9sP34x7u1tEkXB5bwX';
 const PRECISION = Math.pow(10, 18);
@@ -21,15 +27,29 @@ const loadOriginations = () => {
   const Tezos = new TezosToolkit('http://localhost:20000');
   Tezos.setProvider({ signer: signer });
 
-  const { loan_core, collateral_vault, lender_note, borrower_note, test_currency } =
-    loadOriginations();
+  const {
+    loan_core,
+    collateral_vault,
+    lender_note,
+    borrower_note,
+    test_currency,
+    origination_controller,
+  } = loadOriginations();
 
   const loanCore = await Tezos.contract.at<LoanCore>(loan_core.address);
   const collateralVault = await Tezos.contract.at<CollateralVault>(collateral_vault.address);
   const lenderNote = await Tezos.contract.at<LenderNote>(lender_note.address);
   const borrowerNote = await Tezos.contract.at<BorrowerNote>(borrower_note.address);
+  const originationController = await Tezos.contract.at<OriginationController>(
+    origination_controller.address
+  );
 
-  const { set_collateral_vault, set_loan_note_contracts, whitelist_currency } = loanCore.methods;
+  const {
+    set_collateral_vault,
+    set_loan_note_contracts,
+    whitelist_currency,
+    add_origination_controller,
+  } = loanCore.methods;
 
   let operations: {
     method: (...args: any) => ContractMethod<ContractProvider>;
@@ -48,8 +68,18 @@ const loadOriginations = () => {
     },
     {
       method: set_loan_note_contracts,
-      args: [borrower_note.address, lender_note.address],
+      args: [borrowerNote.address, lenderNote.address],
       msg: 'Setting loan note contracts ...',
+    },
+    {
+      method: add_origination_controller,
+      args: [originationController.address],
+      msg: 'Adding origination controller ...',
+    },
+    {
+      method: originationController.methods.set_loan_manager,
+      args: [loanCore.address],
+      msg: 'Setting loan manager in origination controller ...',
     },
     {
       method: collateralVault.methods.set_owner,

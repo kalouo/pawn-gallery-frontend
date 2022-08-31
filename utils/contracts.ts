@@ -1,4 +1,6 @@
-export const loadContractAddresses = () => {
+import { Contracts } from 'contexts/tezos';
+
+export const loadContractAddresses = (): Contracts => {
   if (process.env.NEXT_PUBLIC_NETWORK === 'development') {
     try {
       const deployments = require('../contracts/build/chinstrap_deployments.json');
@@ -7,5 +9,8 @@ export const loadContractAddresses = () => {
     } catch (e) {
       throw Error('Could not load sandbox contracts.');
     }
-  } else return {};
+  } else
+    return {
+      loanCore: '',
+    };
 };
