@@ -1,17 +1,7 @@
 import { createContext, useContext } from 'react';
 import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
-
-interface Currency {
-  name: string;
-  symbol: string;
-  decimals: number;
-  address: string;
-}
-
-export interface Contracts {
-  loanCore: string;
-}
+import { Contracts, Currency } from './types';
 
 interface State {
   tezos?: TezosToolkit;

@@ -1,6 +1,8 @@
 import type { AppProps } from 'next/app';
 
-import { Contracts, TezosContext } from 'contexts/tezos';
+import { Contracts } from 'contexts/tezos/types';
+import { loadContractAddresses } from 'contexts/tezos/setup';
+import { TezosContext } from 'contexts/tezos';
 
 import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
@@ -13,7 +15,6 @@ import { Layout } from 'components/higher-order';
 
 import { store } from 'store';
 import { Provider as StoreProvider } from 'react-redux';
-import { loadContractAddresses } from 'utils/contracts';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [wallet, setWallet] = useState<BeaconWallet>();
