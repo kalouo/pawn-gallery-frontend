@@ -12,20 +12,22 @@ type Storage = {
     loans_by_id: BigMap<nat, {
         collateral_contract: address;
         collateral_token_id: nat;
+        interest_amount: nat;
         loan_denomination_contract: address;
-        loan_denomination_id: nat;
+        loan_denomination_token_id: nat;
         loan_duration: int;
         loan_origination_timestamp: timestamp;
         loan_principal_amount: nat;
-        maximum_interest_amount: nat;
         time_adjustable_interest: boolean;
     }>;
+    origination_controllers: BigMap<address, boolean>;
     owner: address;
     permitted_currencies: BigMap<address, boolean>;
     processing_fee: nat;
 };
 
 type Methods = {
+    add_origination_controller: (param: address) => Promise<void>;
     claim: (param: nat) => Promise<void>;
     repay: (param: nat) => Promise<void>;
     set_collateral_vault: (param: address) => Promise<void>;
@@ -39,12 +41,12 @@ type Methods = {
         borrower: address,
         collateral_contract: address,
         collateral_token_id: nat,
+        interest_amount: nat,
         lender: address,
         loan_denomination_contract: address,
-        loan_denomination_id: nat,
+        loan_denomination_token_id: nat,
         loan_duration: int,
         loan_principal_amount: nat,
-        maximum_interest_amount: nat,
         time_adjustable_interest: boolean,
     ) => Promise<void>;
     whitelist_currency: (
@@ -54,6 +56,7 @@ type Methods = {
 };
 
 type MethodsObject = {
+    add_origination_controller: (param: address) => Promise<void>;
     claim: (param: nat) => Promise<void>;
     repay: (param: nat) => Promise<void>;
     set_collateral_vault: (param: address) => Promise<void>;
@@ -67,12 +70,12 @@ type MethodsObject = {
         borrower: address,
         collateral_contract: address,
         collateral_token_id: nat,
+        interest_amount: nat,
         lender: address,
         loan_denomination_contract: address,
-        loan_denomination_id: nat,
+        loan_denomination_token_id: nat,
         loan_duration: int,
         loan_principal_amount: nat,
-        maximum_interest_amount: nat,
         time_adjustable_interest: boolean,
     }) => Promise<void>;
     whitelist_currency: (params: {
