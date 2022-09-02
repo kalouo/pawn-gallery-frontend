@@ -95,7 +95,10 @@ export default function Example() {
                     name="loanCurrency"
                     rules={{ required: true }}
                     label="Loan Currency"
-                    list={currencies ?? []}
+                    list={(currencies ?? []).map((item, index) => ({
+                      ...item,
+                      id: `ccy-${index}`,
+                    }))}
                   ></Selection>
                 </div>
 
@@ -116,6 +119,16 @@ export default function Example() {
                     name="loanInterest"
                     errors={formErrors}
                     label="Loan Interest"
+                  ></InputField>
+                </div>
+
+                <div className="col-span-3 sm:col-span-4">
+                  <InputField
+                    register={register}
+                    type="number"
+                    name="loanDurationDays"
+                    errors={formErrors}
+                    label="Loan Duration (Days)"
                   ></InputField>
                 </div>
               </div>
