@@ -24,9 +24,9 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     (async () => {
-      if (!wallet) {
+      if (!wallet && process.env.NEXT_PUBLIC_RPC_URL) {
         const _wallet = new BeaconWallet({ name: 'pawn.gallery' });
-        const _tezos = new TezosToolkit('https://mainnet.smartpy.io');
+        const _tezos = new TezosToolkit(process.env.NEXT_PUBLIC_RPC_URL);
         const _contracts = loadContractAddresses();
         const _currencies = loadCurrencies();
 
@@ -36,7 +36,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         setCurrencies(_currencies);
       }
     })();
-  }, [wallet]);
+  }, [wallet, process.env.NEXT_PUBLIC_RPC_URL]);
 
   return (
     <StoreProvider store={store}>
