@@ -1,21 +1,21 @@
 import Link from 'next/link';
 import type { NextPage } from 'next';
 
-import { queryUserAssets } from 'graphql/teztok/queries';
 import PleaseConnect from 'components/PleaseConnect';
 import { useWeb3 } from 'hooks/useWeb3';
+import { useHoldings } from 'hooks/useHoldings';
 
 const Borrow: NextPage = () => {
   const { address } = useWeb3();
 
-  const { data, error } = queryUserAssets({ address });
+  const { data: holdings } = useHoldings(address as string);
 
   return address ? (
     <div className="bg-white">
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">Your Collection</h2>
         <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-          {data?.holdings?.map((asset: { [key: string]: any }, index: number) => {
+          {holdings?.map((asset: { [key: string]: any }, index: number) => {
             const imageSrc = asset?.token?.thumbnail_uri?.replace(
               'ipfs://',
               'https://ipfs.io/ipfs/'
