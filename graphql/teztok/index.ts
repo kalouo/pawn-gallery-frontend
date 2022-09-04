@@ -1,5 +1,17 @@
-import request from 'graphql-request';
+import { Client } from './clients/abstract';
+import { Teztok } from './clients/mainnet';
+import { SandboxClient } from './clients/sandbox';
 
-export const requestor = (query: string, variables: Record<string, unknown>) => {
-  return request('https://api.teztok.com/v1/graphql', query, variables);
-};
+let client;
+
+switch (process.env.NEXT_PUBLIC_NETWORK) {
+  case 'development':
+    client = new SandboxClient();
+    break;
+
+  case 'mainnet':
+    client = new Teztok();
+    break;
+}
+
+export default client as Client;
