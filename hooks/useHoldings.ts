@@ -13,7 +13,7 @@ const loadSandboxHoldings = () => {
         token_id: 0,
         name: 'Test NFT',
         description: '',
-        thumbnail_uri: 'https://source.unsplash.com/random/180x240',
+        thumbnail_uri: '/images/test-nft.jpeg',
         platform: 'Sandbox',
       },
     },
