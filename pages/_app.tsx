@@ -30,13 +30,15 @@ function MyApp({ Component, pageProps }: AppProps) {
         const _contracts = loadContractAddresses();
         const _currencies = loadCurrencies();
 
+        _tezos.setWalletProvider(_wallet);
+
         setWallet(_wallet);
         setTezos(_tezos);
         setContracts(_contracts);
         setCurrencies(_currencies);
       }
     })();
-  }, [wallet, process.env.NEXT_PUBLIC_RPC_URL]);
+  }, [wallet, tezos, process.env.NEXT_PUBLIC_RPC_URL]);
 
   return (
     <StoreProvider store={store}>

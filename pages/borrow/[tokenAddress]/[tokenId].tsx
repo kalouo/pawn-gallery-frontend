@@ -3,19 +3,26 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Joi from 'joi';
 
-import { queryToken } from 'graphql/teztok/queries';
 import InputField from 'components/InputField';
 import Selection from 'components/Selection';
 import { useTezosContext } from 'contexts/tezos';
+import { OriginationController } from 'contract-types';
+import { tas } from 'types/type-aliases';
+import { useCollateral } from 'hooks/useCollateral';
+import { useWeb3 } from 'hooks/useWeb3';
 
 interface IFormInputs {
-  loanAmount: string;
+  loanAmount: number;
+  loanInterest: number;
+  loanCurrency: string;
+  loanDurationDays: number;
 }
 
 const schema = Joi.object({
   loanAmount: Joi.number().required(),
   loanInterest: Joi.number().required(),
   loanCurrency: Joi.string().required(),
+  loanDurationDays: Joi.number().required(),
 });
 
 export default function Example() {
@@ -27,16 +34,38 @@ export default function Example() {
     resolver: joiResolver(schema),
   });
 
-  const onSubmit = (data: IFormInputs) => console.log(data);
+  const { currencies, contracts, tezos } = useTezosContext();
 
-  const { currencies } = useTezosContext();
   const router = useRouter();
 
   const { tokenAddress, tokenId } = router.query;
-  const { data, error } = queryToken({ tokenAddress, tokenId });
-  const token = data?.tokens[0];
+  const { data: collateral } = useCollateral(tokenAddress as string, tokenId as string);
 
-  const src = token?.thumbnail_uri?.replace('ipfs://', 'https://ipfs.io/ipfs/');
+  const src = collateral?.thumbnail_uri?.replace('ipfs://', 'https://ipfs.io/ipfs/');
+
+  const onSubmit = async (data: IFormInputs) => {
+    const originationController = await tezos?.wallet.at(
+      contracts?.originationController as string
+    );
+    const loanAmount = data.loanAmount;
+    const loanInterest = data.loanInterest;
+    const loanDurationDays = data.loanDurationDays;
+    const loanCurrency = currencies?.find((item) => item.symbol === data.loanCurrency);
+    const op = await originationController?.methods
+      .create_request(
+        tas.address(tokenAddress as string),
+        tas.nat(tokenId as string),
+        tas.nat(loanInterest),
+        tas.address(loanCurrency?.address as string),
+        tas.nat(loanCurrency?.tokenId as number),
+        tas.int(loanDurationDays),
+        tas.nat(loanAmount),
+        false
+      )
+      .send();
+    await op?.confirmation(1);
+    console.log(op?.opHash);
+  };
 
   return (
     <div className="bg-white">
@@ -65,12 +94,12 @@ export default function Example() {
             <dl className="hidden text-sm font-medium text-gray-900 space-y-6 border-t border-gray-200 pt-6 lg:block">
               <div className="flex items-center justify-between">
                 <dt className="text-gray-600">Name</dt>
-                <dd>{token?.name}</dd>
+                <dd>{collateral?.name}</dd>
               </div>
 
               <div className="flex items-center justify-between">
                 <dt className="text-gray-600">Platform</dt>
-                <dd>{token?.platform}</dd>
+                <dd>{collateral?.platform}</dd>
               </div>
 
               <div className="flex items-center justify-between border-t border-gray-200 pt-6"></div>
