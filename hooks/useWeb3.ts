@@ -16,7 +16,7 @@ export const useWeb3 = () => {
     if (wallet) {
       try {
         const response = await wallet.client.requestPermissions({
-          network: { type: NetworkType.MAINNET },
+          network: { type: NetworkType.CUSTOM, rpcUrl: process.env.NEXT_PUBLIC_RPC_URL },
         });
         dispatch(setAddress(response.address));
       } catch (error) {
