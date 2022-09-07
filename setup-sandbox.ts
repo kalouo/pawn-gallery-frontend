@@ -1,5 +1,5 @@
 import { InMemorySigner } from '@taquito/signer';
-import { ContractMethod, ContractProvider, TezosToolkit } from '@taquito/taquito';
+import { ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito';
 import { assert } from 'console';
 
 import {
@@ -36,11 +36,11 @@ const loadOriginations = () => {
     origination_controller,
   } = loadOriginations();
 
-  const loanCore = await Tezos.contract.at<LoanCore>(loan_core.address);
-  const collateralVault = await Tezos.contract.at<CollateralVault>(collateral_vault.address);
-  const lenderNote = await Tezos.contract.at<LenderNote>(lender_note.address);
-  const borrowerNote = await Tezos.contract.at<BorrowerNote>(borrower_note.address);
-  const originationController = await Tezos.contract.at<OriginationController>(
+  const loanCore = await Tezos.wallet.at<LoanCore>(loan_core.address);
+  const collateralVault = await Tezos.wallet.at<CollateralVault>(collateral_vault.address);
+  const lenderNote = await Tezos.wallet.at<LenderNote>(lender_note.address);
+  const borrowerNote = await Tezos.wallet.at<BorrowerNote>(borrower_note.address);
+  const originationController = await Tezos.wallet.at<OriginationController>(
     origination_controller.address
   );
 
@@ -52,7 +52,7 @@ const loadOriginations = () => {
   } = loanCore.methods;
 
   let operations: {
-    method: (...args: any) => ContractMethod<ContractProvider>;
+    method: (...args: any) => ContractMethod<Wallet>;
     args: any[];
     msg: string;
   }[] = [
