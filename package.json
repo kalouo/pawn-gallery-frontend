@@ -10,7 +10,9 @@
     "prettier": "npx prettier . --write",
     "prepare": "husky install",
     "update-types": "chmod +x ./update-types.sh && ./update-types.sh",
-    "setup-sandbox": "chmod +x ./setup-sandbox.sh && ./setup-sandbox.sh"
+    "setup-sandbox": "chmod +x ./setup-sandbox.sh && ./setup-sandbox.sh",
+    "start-sandbox": "cd contracts && chinstrap sandbox -p Jakarta -o 20000 -c 5",
+    "stop-sandbox": "cd contracts && chinstrap sandbox -s"
   },
   "dependencies": {
     "@airgap/beacon-sdk": "^3.1.3",
