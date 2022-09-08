@@ -10,6 +10,8 @@ import { OriginationController } from 'contract-types';
 import { tas } from 'types/type-aliases';
 import { useCollateral } from 'hooks/useCollateral';
 import { useWeb3 } from 'hooks/useWeb3';
+import { useState } from 'react';
+import Loader from 'components/Loader';
 
 interface IFormInputs {
   loanAmount: number;
@@ -36,6 +38,16 @@ export default function Example() {
 
   const { currencies, contracts, tezos } = useTezosContext();
 
+  enum TransactionStep {
+    NOT_SUBMITTED,
+    CONFIRMING,
+    CONFIRMED,
+  }
+
+  const [transactionStep, setTransactionStep] = useState<TransactionStep>(
+    TransactionStep.NOT_SUBMITTED
+  );
+
   const router = useRouter();
 
   const { tokenAddress, tokenId } = router.query;
@@ -44,6 +56,7 @@ export default function Example() {
   const src = collateral?.thumbnail_uri?.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
   const onSubmit = async (data: IFormInputs) => {
+    setTransactionStep(TransactionStep.CONFIRMING);
     const originationController = await tezos?.wallet.at(
       contracts?.originationController as string
     );
@@ -64,9 +77,38 @@ export default function Example() {
       )
       .send();
     await op?.confirmation(1);
-    console.log(op?.opHash);
+    setTransactionStep(TransactionStep.CONFIRMED);
   };
 
+  const renderButton = () => {
+    switch (transactionStep) {
+      case TransactionStep.NOT_SUBMITTED:
+        return (
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 sm:ml-6 sm:order-last sm:w-auto"
+          >
+            LIST COLLATERAL
+          </button>
+        );
+
+      case TransactionStep.CONFIRMING: {
+        return (
+          <div className="sm:order-last py-2 px-4">
+            <Loader />
+          </div>
+        );
+      }
+
+      case TransactionStep.CONFIRMED: {
+        return (
+          <div className="sm:order-last mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left.">
+            Transaction confirmed
+          </div>
+        );
+      }
+    }
+  };
   return (
     <div className="bg-white">
       {/* Background color split screen for large screens */}
@@ -164,12 +206,8 @@ export default function Example() {
             </section>
 
             <div className="mt-10 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">
-              <button
-                type="submit"
-                className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 sm:ml-6 sm:order-last sm:w-auto"
-              >
-                LIST COLLATERAL
-              </button>
+              {renderButton()}
+
               <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
                 Lorem Ipsum.
               </p>
