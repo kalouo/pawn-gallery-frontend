@@ -20,7 +20,7 @@ const Tabs = ({ tabItems }: TabsProps) => {
             role="tablist"
           >
             {tabItems.map((item, index) => (
-              <li className="flex-auto text-center">
+              <li className="flex-auto text-center" key={`tab-${index}`}>
                 <a
                   className={
                     `uppercase px-6 py-3 block sm:border-2 sm:border-${color}-600 ` +
@@ -46,6 +46,7 @@ const Tabs = ({ tabItems }: TabsProps) => {
             <div className="tab-content tab-space">
               {tabItems.map((item, index) => (
                 <div
+                  key={`tab-content-${index}`}
                   className={openTab === index ? 'block' : 'hidden'}
                   id={`borrow-content-${index}`}
                 >
