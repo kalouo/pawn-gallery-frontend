@@ -2,15 +2,13 @@ import { joiResolver } from '@hookform/resolvers/joi';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Joi from 'joi';
+import { useState } from 'react';
 
 import InputField from 'components/InputField';
 import Selection from 'components/Selection';
 import { useTezosContext } from 'contexts/tezos';
-import { OriginationController } from 'contract-types';
 import { tas } from 'types/type-aliases';
 import { useCollateral } from 'hooks/useCollateral';
-import { useWeb3 } from 'hooks/useWeb3';
-import { useState } from 'react';
 import Loader from 'components/Loader';
 
 interface IFormInputs {

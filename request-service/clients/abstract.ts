@@ -17,4 +17,23 @@ export interface IRequestService {
     isLoading: boolean;
     isError: Error | null;
   }>;
+
+  getRequestById(args: { tezos: TezosToolkit; contracts: Contracts; requestId: nat }): Promise<{
+    data: {
+      collateralContract: address;
+      collateralTokenId: nat;
+      borrower: address;
+      interestAmount: nat;
+      loanDenominationContract: address;
+      loanDenominationTokenId: nat;
+      loanDuration: int;
+      loanPrincipalAmount: nat;
+      imageUrl: string;
+      collateralName: string;
+      platformName: string;
+      loanCurrency: string;
+    };
+    isLoading: boolean;
+    isError: Error | null;
+  }>;
 }
