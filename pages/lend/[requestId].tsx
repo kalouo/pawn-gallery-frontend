@@ -7,9 +7,13 @@ import { Contracts } from 'contexts/tezos/types';
 import { useState } from 'react';
 import Loader from 'components/Loader';
 import { shortenAddress } from 'utils/address';
+import { useFungibleFA2Balance } from 'hooks/useFungibleFA2Balance';
+import { useWeb3 } from 'hooks/useWeb3';
+import { address, nat } from 'types/type-aliases';
 
-export default function Example() {
+export default function RequestID() {
   const { contracts, tezos } = useTezosContext();
+  const { address } = useWeb3();
 
   const router = useRouter();
 
@@ -19,6 +23,15 @@ export default function Example() {
     tezos: tezos as TezosToolkit,
     contracts: contracts as Contracts,
   });
+
+  const { data: foo } = useFungibleFA2Balance({
+    tezos: tezos as TezosToolkit,
+    assetTokenId: data?.data.loanDenominationTokenId as nat,
+    assetContract: data?.data.loanDenominationContract as address,
+    holderAddress: address as address,
+  });
+
+  console.log('FOO', foo?.toFixed());
 
   enum TransactionStep {
     NOT_SUBMITTED,
@@ -128,10 +141,13 @@ export default function Example() {
                     title: 'Loan Duration',
                     content: `${data?.data.loanDuration} days`,
                   },
-                ].map((i) => (
-                  <div className="mb-6 w-full flex flex-row justify-between">
-                    <div>{i.title}</div>
-                    <div>{i.content}</div>
+                ].map((item, index) => (
+                  <div
+                    className="mb-6 w-full flex flex-row justify-between"
+                    key={`request-item-${index}`}
+                  >
+                    <div>{item.title}</div>
+                    <div>{item.content}</div>
                   </div>
                 ))}
               </div>
