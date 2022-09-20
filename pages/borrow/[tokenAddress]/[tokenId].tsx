@@ -10,6 +10,9 @@ import { useTezosContext } from 'contexts/tezos';
 import { tas } from 'types/type-aliases';
 import { useCollateral } from 'hooks/useCollateral';
 import Loader from 'components/Loader';
+import FungibleFA2Service from 'fungible-FA2-service';
+import { ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito';
+import { useWeb3 } from 'hooks/useWeb3';
 
 interface IFormInputs {
   loanAmount: number;
@@ -35,6 +38,7 @@ export default function Example() {
   });
 
   const { currencies, contracts, tezos } = useTezosContext();
+  const { address } = useWeb3();
 
   enum TransactionStep {
     NOT_SUBMITTED,
@@ -62,8 +66,15 @@ export default function Example() {
     const loanInterest = data.loanInterest;
     const loanDurationDays = data.loanDurationDays;
     const loanCurrency = currencies?.find((item) => item.symbol === data.loanCurrency);
-    const op = await originationController?.methods
-      .create_request(
+    const ops = [
+      await new FungibleFA2Service(tokenAddress).operationAddOperator({
+        tezos: tezos as TezosToolkit,
+        assetContract: tas.address(tokenAddress as string),
+        assetTokenId: tas.nat(tokenId as string),
+        owner: tas.address(address as string),
+        operator: tas.address(contracts?.loanCore as string),
+      }),
+      originationController?.methods.create_request(
         tas.address(tokenAddress as string),
         tas.nat(tokenId as string),
         tas.nat(loanInterest),
@@ -72,9 +83,17 @@ export default function Example() {
         tas.int(loanDurationDays),
         tas.nat(loanAmount),
         false
-      )
+      ),
+    ];
+
+    const batchOp = await tezos?.wallet
+      .batch()
+      .withContractCall(ops[0] as ContractMethod<Wallet>)
+      .withContractCall(ops[1] as ContractMethod<Wallet>)
       .send();
-    await op?.confirmation(1);
+
+    await batchOp?.confirmation(1);
+
     setTransactionStep(TransactionStep.CONFIRMED);
   };
 

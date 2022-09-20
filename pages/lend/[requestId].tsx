@@ -10,6 +10,7 @@ import { shortenAddress } from 'utils/address';
 import { useFungibleFA2Balance } from 'hooks/useFungibleFA2Balance';
 import { useWeb3 } from 'hooks/useWeb3';
 import { address, nat } from 'types/type-aliases';
+import { useFA2Operator } from 'hooks/useFA2Operator';
 
 export default function RequestID() {
   const { contracts, tezos } = useTezosContext();
@@ -24,14 +25,20 @@ export default function RequestID() {
     contracts: contracts as Contracts,
   });
 
-  const { data: foo } = useFungibleFA2Balance({
+  const { data: currencyBalance } = useFungibleFA2Balance({
     tezos: tezos as TezosToolkit,
     assetTokenId: data?.data.loanDenominationTokenId as nat,
     assetContract: data?.data.loanDenominationContract as address,
     holderAddress: address as address,
   });
 
-  console.log('FOO', foo?.toFixed());
+  const { data: isApproved } = useFA2Operator({
+    tezos: tezos as TezosToolkit,
+    assetTokenId: data?.data.collateralTokenId as nat,
+    assetContract: data?.data.collateralContract as address,
+    owner: data?.data.borrower as address,
+    operator: contracts?.loanCore as address,
+  });
 
   enum TransactionStep {
     NOT_SUBMITTED,
@@ -156,9 +163,21 @@ export default function RequestID() {
             <div className="mt-10 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">
               {renderButton()}
 
-              <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
-                Lorem Ipsum.
-              </p>
+              <div className="sm:flex sm: flex-col flex flex-col">
+                <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
+                  {currencyBalance &&
+                  data?.data.loanPrincipalAmount &&
+                  currencyBalance.gte(data.data.loanPrincipalAmount)
+                    ? 'Your balance is sufficient'
+                    : 'Your balance is NOT sufficient.'}
+                </p>
+
+                <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
+                  {isApproved
+                    ? 'Collateral is approved for transfer to escrow.'
+                    : 'Collateral is NOT approved for transfer to escrow.'}
+                </p>
+              </div>
             </div>
           </div>
         </div>
