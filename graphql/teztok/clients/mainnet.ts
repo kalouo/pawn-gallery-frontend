@@ -8,8 +8,8 @@ const requestor = (query: string, variables: Record<string, unknown>) => {
 };
 
 export class Teztok implements Client {
-  public getHoldings(address: string) {
-    const { data, error } = this.constructQuery(ALL_USER_ASSETS_QUERY, { address })();
+  public async getHoldings(args: { address: string }) {
+    const { data, error } = this.constructQuery(ALL_USER_ASSETS_QUERY, { address: args.address })();
     return { data: data?.holdings, isLoading: !error && !data, isError: error };
   }
 

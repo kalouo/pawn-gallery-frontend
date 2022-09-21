@@ -5,14 +5,21 @@ import PleaseConnect from 'components/PleaseConnect';
 import { useWeb3 } from 'hooks/useWeb3';
 import { useHoldings } from 'hooks/useHoldings';
 import Tabs from 'components/Tabs';
+import { useTezosContext } from 'contexts/tezos';
 
 const Holdings = ({ address }: { address: string }) => {
-  const { data: holdings } = useHoldings(address);
+  const { tezos } = useTezosContext();
+
+  if (!tezos) {
+    throw Error('Tezos provider is not defined! ');
+  }
+
+  const { data } = useHoldings(address, tezos);
 
   return (
     <div className="max-w-2xl mx-auto py-4 px-4 sm:px-0 sm:py-12 lg:max-w-7xl">
       <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-        {holdings?.map((asset: { [key: string]: any }, index: number) => {
+        {data?.data?.map((asset: { [key: string]: any }, index: number) => {
           const imageSrc = asset?.token?.thumbnail_uri?.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
           return (

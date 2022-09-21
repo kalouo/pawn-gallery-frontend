@@ -1,11 +1,12 @@
+import { TezosToolkit } from '@taquito/taquito';
 import { Collateral, Holding } from 'graphql/teztok/types';
 
 export interface Client {
-  getHoldings(address: string): {
+  getHoldings(args: { address: string; tezos: TezosToolkit }): Promise<{
     data: Holding[] | undefined;
     isLoading: boolean;
     isError: Error | null;
-  };
+  }>;
 
   getCollateral(
     tokenAddress: string,
