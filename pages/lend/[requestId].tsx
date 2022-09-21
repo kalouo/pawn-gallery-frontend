@@ -9,8 +9,10 @@ import Loader from 'components/Loader';
 import { shortenAddress } from 'utils/address';
 import { useCurrencyBalance } from 'hooks/useCurrencyBalance';
 import { useWeb3 } from 'hooks/useWeb3';
-import { address, nat } from 'types/type-aliases';
+import { address, nat, tas } from 'types/type-aliases';
 import { useCollateralOperator } from 'hooks/useCollateralOperator';
+import CurrencyService from 'token-service/currency';
+import { OriginationController } from 'contract-types';
 
 export default function RequestID() {
   const { contracts, tezos } = useTezosContext();
@@ -37,7 +39,7 @@ export default function RequestID() {
     assetTokenId: data?.data.collateralTokenId as nat,
     assetContract: data?.data.collateralContract as address,
     owner: data?.data.borrower as address,
-    operator: contracts?.loanCore as address,
+    operator: contracts?.collateralVault as address,
   });
 
   enum TransactionStep {
@@ -50,7 +52,36 @@ export default function RequestID() {
     TransactionStep.NOT_SUBMITTED
   );
 
-  const handleSubmit = () => console.log('Submit!');
+  const handleSubmit = async () => {
+    const currencyService = await new CurrencyService().setTarget(
+      data?.data.loanDenominationContract as address,
+      tezos as TezosToolkit
+    );
+    const originationController = await tezos?.wallet.at<OriginationController>(
+      contracts?.originationController as string
+    );
+
+    if (!originationController) {
+      throw Error('Failed to set origination controller.');
+    }
+
+    const operations = [
+      currencyService.addOperator({
+        tezos: tezos as TezosToolkit,
+        assetContract: data?.data.loanDenominationContract as address,
+        assetTokenId: data?.data.loanDenominationTokenId as nat,
+        owner: tas.address(address as string),
+        operator: tas.address(contracts?.loanCore as string),
+      }),
+      originationController.methods.originate_loan(tas.nat(requestId as string)),
+    ];
+
+    const batch = operations.reduce((acc, i) => acc?.withContractCall(i), tezos?.wallet.batch());
+    const op = await batch?.send();
+    await op?.confirmation(1);
+
+    setTransactionStep(TransactionStep.CONFIRMED);
+  };
 
   const renderButton = () => {
     switch (transactionStep) {

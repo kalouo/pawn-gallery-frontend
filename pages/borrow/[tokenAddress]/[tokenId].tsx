@@ -83,7 +83,7 @@ export default function Example() {
         assetContract: tas.address(tokenAddress as string),
         assetTokenId: tas.nat(tokenId as string),
         owner: tas.address(address as string),
-        operator: tas.address(contracts?.loanCore as string),
+        operator: tas.address(contracts?.collateralVault as string),
       }),
       originationController.methods.create_request(
         tas.address(tokenAddress as string),

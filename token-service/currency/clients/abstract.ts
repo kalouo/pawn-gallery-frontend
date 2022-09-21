@@ -2,6 +2,8 @@ import { ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito';
 import { address, nat } from 'types/type-aliases';
 
 export interface ICurrencyService {
+  setTarget(address: address, tezos: TezosToolkit): Promise<this>;
+
   getBalance({
     tezos,
     assetContract,

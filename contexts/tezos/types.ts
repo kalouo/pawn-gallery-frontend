@@ -10,4 +10,5 @@ export interface Currency {
 export interface Contracts {
   loanCore: string;
   originationController: string;
+  collateralVault: string;
 }
