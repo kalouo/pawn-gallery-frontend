@@ -2,6 +2,8 @@ import { ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito';
 import { address, nat } from 'types/type-aliases';
 
 export interface INFTService {
+  setTarget(address: address, tezos: TezosToolkit): Promise<this>;
+
   getOperator({
     tezos,
     assetContract,
@@ -15,6 +17,7 @@ export interface INFTService {
     owner: address;
     operator: address;
   }): Promise<boolean>;
+
   operationAddOperator({
     tezos,
     assetContract,
@@ -27,7 +30,7 @@ export interface INFTService {
     assetTokenId: nat;
     owner: address;
     operator: address;
-  }): Promise<ContractMethod<Wallet>>;
+  }): ContractMethod<Wallet>;
 
   operationRemoveOperator({
     tezos,
@@ -41,5 +44,5 @@ export interface INFTService {
     assetTokenId: nat;
     owner: address;
     operator: address;
-  }): Promise<ContractMethod<Wallet>>;
+  }): ContractMethod<Wallet>;
 }

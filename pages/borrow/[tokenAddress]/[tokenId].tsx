@@ -10,7 +10,7 @@ import { useTezosContext } from 'contexts/tezos';
 import { tas } from 'types/type-aliases';
 import { useCollateral } from 'hooks/useCollateral';
 import Loader from 'components/Loader';
-import CurrencyService from 'token-service/currency';
+import NFTService from 'token-service/nft';
 import { ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito';
 import { useWeb3 } from 'hooks/useWeb3';
 
@@ -62,19 +62,30 @@ export default function Example() {
     const originationController = await tezos?.wallet.at(
       contracts?.originationController as string
     );
+
+    if (!originationController) {
+      throw Error('Failed to set origination controller.');
+    }
+
     const loanAmount = data.loanAmount;
     const loanInterest = data.loanInterest;
     const loanDurationDays = data.loanDurationDays;
     const loanCurrency = currencies?.find((item) => item.symbol === data.loanCurrency);
-    const ops = [
-      await new CurrencyService(tokenAddress).operationAddOperator({
+
+    const nftService = await new NFTService().setTarget(
+      tas.address(tokenAddress as string),
+      tezos as TezosToolkit
+    );
+
+    const ops: ContractMethod<Wallet>[] = [
+      nftService.operationAddOperator({
         tezos: tezos as TezosToolkit,
         assetContract: tas.address(tokenAddress as string),
         assetTokenId: tas.nat(tokenId as string),
         owner: tas.address(address as string),
         operator: tas.address(contracts?.loanCore as string),
       }),
-      originationController?.methods.create_request(
+      originationController.methods.create_request(
         tas.address(tokenAddress as string),
         tas.nat(tokenId as string),
         tas.nat(loanInterest),
@@ -86,13 +97,9 @@ export default function Example() {
       ),
     ];
 
-    const batchOp = await tezos?.wallet
-      .batch()
-      .withContractCall(ops[0] as ContractMethod<Wallet>)
-      .withContractCall(ops[1] as ContractMethod<Wallet>)
-      .send();
-
-    await batchOp?.confirmation(1);
+    const batch = ops.reduce((acc, i) => acc?.withContractCall(i), tezos?.wallet.batch());
+    const op = await batch?.send();
+    await op?.confirmation(1);
 
     setTransactionStep(TransactionStep.CONFIRMED);
   };
