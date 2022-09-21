@@ -39,7 +39,7 @@ export interface ICurrencyService {
     assetTokenId: nat;
     owner: address;
     operator: address;
-  }): Promise<ContractMethod<Wallet>>;
+  }): ContractMethod<Wallet>;
 
   removeOperator({
     tezos,
@@ -53,5 +53,5 @@ export interface ICurrencyService {
     assetTokenId: nat;
     owner: address;
     operator: address;
-  }): Promise<ContractMethod<Wallet>>;
+  }): ContractMethod<Wallet>;
 }

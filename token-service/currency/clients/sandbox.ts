@@ -4,9 +4,12 @@ import { ICurrencyService } from './abstract';
 import { address, nat, tas } from 'types/type-aliases';
 
 export class SandboxCurrencyService implements ICurrencyService {
-  address: string;
-  constructor(address: string) {
-    this.address = address;
+  contract?: FA2Fungible;
+
+  public async setTarget(address: address, tezos: TezosToolkit) {
+    const contract = await tezos.wallet.at<FA2Fungible>(address);
+    this.contract = contract;
+    return this;
   }
 
   public async getBalance(args: {
@@ -59,37 +62,51 @@ export class SandboxCurrencyService implements ICurrencyService {
     }
   }
 
-  public async addOperator(args: {
+  public addOperator(args: {
     tezos: TezosToolkit;
     assetContract: address;
     assetTokenId: nat;
     owner: address;
     operator: address;
-  }): Promise<ContractMethod<Wallet>> {
-    const contract = await args.tezos.wallet.at<FA2Fungible>(args.assetContract);
-    console.log(contract.methods);
-    const op = contract.methods.update_operators([
-      {
-        add_operator: {
-          owner: args.owner,
-          operator: args.operator,
-          token_id: args.assetTokenId,
+  }): ContractMethod<Wallet> {
+    if (!this.contract) {
+      throw Error('No contract defined in NFT service class.');
+    } else {
+      const op = this.contract.methods.update_operators([
+        {
+          add_operator: {
+            owner: args.owner,
+            operator: args.operator,
+            token_id: args.assetTokenId,
+          },
         },
-      },
-    ]);
+      ]);
 
-    return op;
+      return op;
+    }
   }
 
-  public async removeOperator(args: {
+  public removeOperator(args: {
     tezos: TezosToolkit;
     assetContract: address;
     assetTokenId: nat;
     owner: address;
     operator: address;
-  }): Promise<ContractMethod<Wallet>> {
-    const contract = await args.tezos.wallet.at<FA2Fungible>(args.assetContract);
-    const op = contract.methods.remove_operator(args.owner, args.operator, args.assetTokenId);
-    return op;
+  }): ContractMethod<Wallet> {
+    if (!this.contract) {
+      throw Error('No contract defined in NFT service class.');
+    } else {
+      const op = this.contract.methods.update_operators([
+        {
+          remove_operator: {
+            owner: args.owner,
+            operator: args.operator,
+            token_id: args.assetTokenId,
+          },
+        },
+      ]);
+
+      return op;
+    }
   }
 }
