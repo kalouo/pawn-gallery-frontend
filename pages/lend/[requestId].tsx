@@ -11,8 +11,10 @@ import { useCurrencyBalance } from 'hooks/useCurrencyBalance';
 import { useWeb3 } from 'hooks/useWeb3';
 import { address, nat, tas } from 'types/type-aliases';
 import { useCollateralOperator } from 'hooks/useCollateralOperator';
+import { useNFTBalance } from 'hooks/useNFTBalance';
 import CurrencyService from 'token-service/currency';
 import { OriginationController } from 'contract-types';
+import { ExclamationCircleIcon, BadgeCheckIcon } from '@heroicons/react/solid';
 
 export default function RequestID() {
   const { contracts, tezos } = useTezosContext();
@@ -34,6 +36,13 @@ export default function RequestID() {
     holderAddress: address as address,
   });
 
+  const { data: collateralOwner } = useNFTBalance({
+    tezos: tezos as TezosToolkit,
+    assetContract: data?.data.collateralContract as address,
+    assetTokenId: data?.data.collateralTokenId as nat,
+    holderAddress: address as string,
+  });
+
   const { data: isApproved } = useCollateralOperator({
     tezos: tezos as TezosToolkit,
     assetTokenId: data?.data.collateralTokenId as nat,
@@ -53,6 +62,8 @@ export default function RequestID() {
   );
 
   const handleSubmit = async () => {
+    setTransactionStep(TransactionStep.CONFIRMING);
+
     const currencyService = await new CurrencyService().setTarget(
       data?.data.loanDenominationContract as address,
       tezos as TezosToolkit
@@ -74,6 +85,13 @@ export default function RequestID() {
         operator: tas.address(contracts?.loanCore as string),
       }),
       originationController.methods.originate_loan(tas.nat(requestId as string)),
+      currencyService.removeOperator({
+        tezos: tezos as TezosToolkit,
+        assetContract: data?.data.loanDenominationContract as address,
+        assetTokenId: data?.data.loanDenominationTokenId as nat,
+        owner: tas.address(address as string),
+        operator: tas.address(contracts?.loanCore as string),
+      }),
     ];
 
     const batch = operations.reduce((acc, i) => acc?.withContractCall(i), tezos?.wallet.batch());
@@ -113,6 +131,7 @@ export default function RequestID() {
       }
     }
   };
+
   return (
     <div className="bg-white">
       {/* Background color split screen for large screens */}
@@ -191,22 +210,56 @@ export default function RequestID() {
               </div>
             </section>
 
-            <div className="mt-10 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left ">
+                {currencyBalance &&
+                data?.data.loanPrincipalAmount &&
+                currencyBalance.gte(data.data.loanPrincipalAmount) ? (
+                  <div className="flex">
+                    <BadgeCheckIcon className="h-5 w-5 text-green-500" /> &nbsp; Your balance is
+                    sufficient
+                  </div>
+                ) : (
+                  <div className="flex">
+                    <ExclamationCircleIcon className="h-5 w-5 text-red-500" /> &nbsp; Your balance
+                    is not sufficient.
+                  </div>
+                )}
+              </div>
+              <div className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left ">
+                {data?.data.borrower === collateralOwner ? (
+                  <div className="flex">
+                    <BadgeCheckIcon className="h-5 w-5 text-green-500" /> &nbsp; The collateral is
+                    owned by the borrower.
+                  </div>
+                ) : (
+                  <div className="flex">
+                    <ExclamationCircleIcon className="h-5 w-5 text-red-500" /> &nbsp; The collateral
+                    is NOT owned by the borrower.
+                  </div>
+                )}
+              </div>
+              <div className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left ">
+                {isApproved ? (
+                  <div className="flex">
+                    <BadgeCheckIcon className="h-5 w-5 text-green-500" /> &nbsp; The collateral is
+                    approved for transfer to the escrow.
+                  </div>
+                ) : (
+                  <div className="flex">
+                    <ExclamationCircleIcon className="h-5 w-5 text-red-500" /> &nbsp; The collateral
+                    is NOT approved for transfer to the escrow.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">
               {renderButton()}
 
               <div className="sm:flex sm: flex-col flex flex-col">
                 <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
-                  {currencyBalance &&
-                  data?.data.loanPrincipalAmount &&
-                  currencyBalance.gte(data.data.loanPrincipalAmount)
-                    ? 'Your balance is sufficient'
-                    : 'Your balance is NOT sufficient.'}
-                </p>
-
-                <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
-                  {isApproved
-                    ? 'Collateral is approved for transfer to escrow.'
-                    : 'Collateral is NOT approved for transfer to escrow.'}
+                  Lorem ipsum.
                 </p>
               </div>
             </div>

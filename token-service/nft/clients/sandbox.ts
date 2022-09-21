@@ -12,6 +12,27 @@ export class SandboxNFTService implements INFTService {
     return this;
   }
 
+  public async getBalance(args: {
+    tezos: TezosToolkit;
+    assetContract: address;
+    assetTokenId: nat;
+    holderAddress: address;
+  }) {
+    if (!args.tezos || !args.assetContract || !args.assetTokenId || !args.holderAddress) {
+      return null;
+    }
+    try {
+      const contract = await args.tezos.wallet.at<FA2NFT>(args.assetContract);
+      const storage = await contract.storage();
+      const entry = await storage.ledger.get(args.assetTokenId);
+
+      return entry;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
   public async getOperator(args: {
     tezos: TezosToolkit;
     assetContract: address;
