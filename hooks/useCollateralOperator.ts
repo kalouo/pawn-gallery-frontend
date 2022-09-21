@@ -1,21 +1,24 @@
 import { TezosToolkit } from '@taquito/taquito';
-import FungibleFA2Service from 'fungible-FA2-service';
 import useSWR from 'swr';
-import { address, nat } from 'types/type-aliases';
 
-export const useFungibleFA2Balance = ({
+import { address, nat } from 'types/type-aliases';
+import NFTService from 'token-service/nft';
+
+export const useCollateralOperator = ({
   tezos,
-  holderAddress,
+  owner,
+  operator,
   assetContract,
   assetTokenId,
 }: {
   tezos: TezosToolkit;
   assetContract: address;
   assetTokenId: nat;
-  holderAddress: string;
+  owner: string;
+  operator: string;
 }) => {
   return useSWR(
-    [{ tezos, holderAddress, assetContract, assetTokenId }],
-    new FungibleFA2Service(assetContract).getBalance
+    [{ tezos, owner, operator, assetContract, assetTokenId }],
+    new NFTService(assetContract).getOperator
   );
 };

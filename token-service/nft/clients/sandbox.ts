@@ -1,34 +1,12 @@
 import { ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito';
-import { FA2Fungible } from 'contract-types';
-import { IFungibleFA2Service } from './abstract';
+import { FA2NFT } from 'contract-types';
+import { INFTService } from './abstract';
 import { address, nat, tas } from 'types/type-aliases';
 
-export class SandboxFungibleFA2Service implements IFungibleFA2Service {
+export class SandboxNFTService implements INFTService {
   address: string;
   constructor(address: string) {
     this.address = address;
-  }
-
-  public async getBalance(args: {
-    tezos: TezosToolkit;
-    assetContract: address;
-    assetTokenId: nat;
-    holderAddress: address;
-  }) {
-    if (!args.tezos || !args.assetContract || !args.assetTokenId || !args.holderAddress) {
-      return tas.nat(0);
-    }
-    try {
-      const contract = await args.tezos.wallet.at<FA2Fungible>(args.assetContract);
-      const storage = await contract.storage();
-      const ledgerKey = { 0: args.holderAddress, 1: args.assetTokenId };
-      const balance = await storage.ledger.get(ledgerKey);
-
-      return balance;
-    } catch (e) {
-      console.log(e);
-      return tas.nat(0);
-    }
   }
 
   public async getOperator(args: {
@@ -42,7 +20,7 @@ export class SandboxFungibleFA2Service implements IFungibleFA2Service {
       return false;
     }
     try {
-      const contract = await args.tezos.wallet.at<FA2Fungible>(args.assetContract);
+      const contract = await args.tezos.wallet.at<FA2NFT>(args.assetContract);
       const storage = await contract.storage();
       const operatorKey = {
         owner: args.owner,
@@ -66,11 +44,17 @@ export class SandboxFungibleFA2Service implements IFungibleFA2Service {
     owner: address;
     operator: address;
   }): Promise<ContractMethod<Wallet>> {
-    const contract = await args.tezos.wallet.at(args.assetContract);
-    console.log(contract.methods);
+    const contract = await args.tezos.wallet.at<FA2NFT>(args.assetContract);
     const op = contract.methods.update_operators([
-      { add_operator: { owner: args.owner, operator: args.operator, token_id: args.assetTokenId } },
+      {
+        add_operator: {
+          owner: args.owner,
+          operator: args.operator,
+          token_id: args.assetTokenId,
+        },
+      },
     ]);
+
     return op;
   }
 
@@ -81,8 +65,17 @@ export class SandboxFungibleFA2Service implements IFungibleFA2Service {
     owner: address;
     operator: address;
   }): Promise<ContractMethod<Wallet>> {
-    const contract = await args.tezos.wallet.at<FA2Fungible>(args.assetContract);
-    const op = contract.methods.remove_operator(args.owner, args.operator, args.assetTokenId);
+    const contract = await args.tezos.wallet.at<FA2NFT>(args.assetContract);
+    const op = contract.methods.update_operators([
+      {
+        remove_operator: {
+          owner: args.owner,
+          operator: args.operator,
+          token_id: args.assetTokenId,
+        },
+      },
+    ]);
+
     return op;
   }
 }

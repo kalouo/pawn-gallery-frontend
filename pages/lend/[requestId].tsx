@@ -7,10 +7,10 @@ import { Contracts } from 'contexts/tezos/types';
 import { useState } from 'react';
 import Loader from 'components/Loader';
 import { shortenAddress } from 'utils/address';
-import { useFungibleFA2Balance } from 'hooks/useFungibleFA2Balance';
+import { useCurrencyBalance } from 'hooks/useCurrencyBalance';
 import { useWeb3 } from 'hooks/useWeb3';
 import { address, nat } from 'types/type-aliases';
-import { useFA2Operator } from 'hooks/useFA2Operator';
+import { useCollateralOperator } from 'hooks/useCollateralOperator';
 
 export default function RequestID() {
   const { contracts, tezos } = useTezosContext();
@@ -25,14 +25,14 @@ export default function RequestID() {
     contracts: contracts as Contracts,
   });
 
-  const { data: currencyBalance } = useFungibleFA2Balance({
+  const { data: currencyBalance } = useCurrencyBalance({
     tezos: tezos as TezosToolkit,
     assetTokenId: data?.data.loanDenominationTokenId as nat,
     assetContract: data?.data.loanDenominationContract as address,
     holderAddress: address as address,
   });
 
-  const { data: isApproved } = useFA2Operator({
+  const { data: isApproved } = useCollateralOperator({
     tezos: tezos as TezosToolkit,
     assetTokenId: data?.data.collateralTokenId as nat,
     assetContract: data?.data.collateralContract as address,

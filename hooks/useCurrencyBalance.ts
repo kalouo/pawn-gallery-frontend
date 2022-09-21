@@ -1,23 +1,22 @@
 import { TezosToolkit } from '@taquito/taquito';
-import FungibleFA2Service from 'fungible-FA2-service';
 import useSWR from 'swr';
-import { address, nat } from 'types/type-aliases';
 
-export const useFA2Operator = ({
+import { address, nat } from 'types/type-aliases';
+import CurrencyService from 'token-service/currency';
+
+export const useCurrencyBalance = ({
   tezos,
-  owner,
-  operator,
+  holderAddress,
   assetContract,
   assetTokenId,
 }: {
   tezos: TezosToolkit;
   assetContract: address;
   assetTokenId: nat;
-  owner: string;
-  operator: string;
+  holderAddress: string;
 }) => {
   return useSWR(
-    [{ tezos, owner, operator, assetContract, assetTokenId }],
-    new FungibleFA2Service(assetContract).getOperator
+    [{ tezos, holderAddress, assetContract, assetTokenId }],
+    new CurrencyService(assetContract).getBalance
   );
 };

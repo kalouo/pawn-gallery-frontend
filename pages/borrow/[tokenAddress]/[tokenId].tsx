@@ -10,7 +10,7 @@ import { useTezosContext } from 'contexts/tezos';
 import { tas } from 'types/type-aliases';
 import { useCollateral } from 'hooks/useCollateral';
 import Loader from 'components/Loader';
-import FungibleFA2Service from 'fungible-FA2-service';
+import CurrencyService from 'token-service/currency';
 import { ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito';
 import { useWeb3 } from 'hooks/useWeb3';
 
@@ -67,7 +67,7 @@ export default function Example() {
     const loanDurationDays = data.loanDurationDays;
     const loanCurrency = currencies?.find((item) => item.symbol === data.loanCurrency);
     const ops = [
-      await new FungibleFA2Service(tokenAddress).operationAddOperator({
+      await new CurrencyService(tokenAddress).operationAddOperator({
         tezos: tezos as TezosToolkit,
         assetContract: tas.address(tokenAddress as string),
         assetTokenId: tas.nat(tokenId as string),
