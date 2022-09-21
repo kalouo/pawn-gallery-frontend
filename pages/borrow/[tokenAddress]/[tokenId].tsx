@@ -78,7 +78,7 @@ export default function Example() {
     );
 
     const ops: ContractMethod<Wallet>[] = [
-      nftService.operationAddOperator({
+      nftService.addOperator({
         tezos: tezos as TezosToolkit,
         assetContract: tas.address(tokenAddress as string),
         assetTokenId: tas.nat(tokenId as string),

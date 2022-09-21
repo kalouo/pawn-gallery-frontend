@@ -18,7 +18,7 @@ export interface INFTService {
     operator: address;
   }): Promise<boolean>;
 
-  operationAddOperator({
+  addOperator({
     tezos,
     assetContract,
     assetTokenId,
@@ -32,7 +32,7 @@ export interface INFTService {
     operator: address;
   }): ContractMethod<Wallet>;
 
-  operationRemoveOperator({
+  removeOperator({
     tezos,
     assetContract,
     assetTokenId,

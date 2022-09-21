@@ -59,7 +59,7 @@ export class SandboxCurrencyService implements ICurrencyService {
     }
   }
 
-  public async operationAddOperator(args: {
+  public async addOperator(args: {
     tezos: TezosToolkit;
     assetContract: address;
     assetTokenId: nat;
@@ -81,7 +81,7 @@ export class SandboxCurrencyService implements ICurrencyService {
     return op;
   }
 
-  public async operationRemoveOperator(args: {
+  public async removeOperator(args: {
     tezos: TezosToolkit;
     assetContract: address;
     assetTokenId: nat;

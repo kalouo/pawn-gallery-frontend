@@ -41,7 +41,7 @@ export class SandboxNFTService implements INFTService {
     }
   }
 
-  public operationAddOperator(args: {
+  public addOperator(args: {
     tezos: TezosToolkit;
     assetContract: address;
     assetTokenId: nat;
@@ -65,7 +65,7 @@ export class SandboxNFTService implements INFTService {
     }
   }
 
-  public operationRemoveOperator(args: {
+  public removeOperator(args: {
     tezos: TezosToolkit;
     assetContract: address;
     assetTokenId: nat;

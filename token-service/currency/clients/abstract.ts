@@ -27,7 +27,7 @@ export interface ICurrencyService {
     owner: address;
     operator: address;
   }): Promise<boolean>;
-  operationAddOperator({
+  addOperator({
     tezos,
     assetContract,
     assetTokenId,
@@ -41,7 +41,7 @@ export interface ICurrencyService {
     operator: address;
   }): Promise<ContractMethod<Wallet>>;
 
-  operationRemoveOperator({
+  removeOperator({
     tezos,
     assetContract,
     assetTokenId,
