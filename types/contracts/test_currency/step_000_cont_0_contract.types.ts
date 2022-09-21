@@ -58,6 +58,9 @@ type Methods = {
         operator: address,
         token_id: nat,
     ) => Promise<void>;
+    update_operators: (
+        params: ({ add_operator: { owner: address, operator: address, token_id: nat } } | { remove_operator: { owner: address, operator: address, token_id: nat } })[]
+    ) => Promise<void>;
     withdraw_mutez: (
         amount: mutez,
         destination: address,
@@ -100,6 +103,9 @@ type MethodsObject = {
         operator: address,
         token_id: nat,
     }) => Promise<void>;
+    update_operators: (
+        params: ({ add_operator: { owner: address, operator: address, token_id: nat } } | { remove_operator: { owner: address, operator: address, token_id: nat } })[]
+    ) => Promise<void>;
     withdraw_mutez: (params: {
         amount: mutez,
         destination: address,
