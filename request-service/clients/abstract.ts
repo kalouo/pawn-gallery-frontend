@@ -41,7 +41,7 @@ export interface IRequestService {
       collateralName: string;
       platformName: string;
       loanCurrency: string;
-    };
+    } | null;
     isLoading: boolean;
     isError: Error | null;
   }>;

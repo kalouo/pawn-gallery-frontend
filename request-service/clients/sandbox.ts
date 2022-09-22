@@ -25,7 +25,7 @@ export class SandboxRequestService implements IRequestService {
     const result = await Promise.all([storage?.requests_by_id.get(tas.nat(0))]);
 
     return {
-      data: result.map((item, index) => {
+      data: result.filter(Boolean).map((item, index) => {
         const loanCurrency = currencies?.find(
           (ccy) => ccy.address === item.loan_denomination_contract
         );
@@ -59,13 +59,19 @@ export class SandboxRequestService implements IRequestService {
     currencies: Currency[];
     requestId: nat;
   }) {
-    console.log(args.currencies);
     const originationController = await args.tezos?.wallet.at<OriginationController>(
       args.contracts?.originationController as string
     );
 
     const storage = await originationController?.storage();
     const request = await storage?.requests_by_id.get(args.requestId);
+
+    if (!request)
+      return {
+        data: null,
+        isLoading: false,
+        isError: Error('404: NOT FOUND'),
+      };
 
     const loanCurrency = args.currencies?.find(
       (ccy) => ccy.address === request.loan_denomination_contract

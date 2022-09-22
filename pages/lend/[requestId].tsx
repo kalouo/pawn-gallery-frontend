@@ -15,6 +15,7 @@ import { useNFTBalance } from 'hooks/useNFTBalance';
 import CurrencyService from 'token-service/currency';
 import { OriginationController } from 'contract-types';
 import { ExclamationCircleIcon, BadgeCheckIcon } from '@heroicons/react/solid';
+import Error404 from 'components/404';
 
 export default function RequestID() {
   const { contracts, tezos, currencies } = useTezosContext();
@@ -23,32 +24,42 @@ export default function RequestID() {
   const router = useRouter();
 
   const { requestId } = router.query;
-  const { data } = useRequest({
+
+  const { data: request } = useRequest({
     requestId: requestId as string,
     tezos: tezos as TezosToolkit,
     contracts: contracts as Contracts,
     currencies: currencies as Currency[],
   });
 
+  if (!request?.data) {
+    return (
+      <Error404
+        header="Request not found"
+        subheader="Please check the URL in the address bar and try again."
+      ></Error404>
+    );
+  }
+
   const { data: currencyBalance } = useCurrencyBalance({
     tezos: tezos as TezosToolkit,
-    assetTokenId: data?.data.loanDenominationTokenId as nat,
-    assetContract: data?.data.loanDenominationContract as address,
+    assetTokenId: request?.data.loanDenominationTokenId as nat,
+    assetContract: request?.data.loanDenominationContract as address,
     holderAddress: address as address,
   });
 
   const { data: collateralOwner } = useNFTBalance({
     tezos: tezos as TezosToolkit,
-    assetContract: data?.data.collateralContract as address,
-    assetTokenId: data?.data.collateralTokenId as nat,
+    assetContract: request?.data.collateralContract as address,
+    assetTokenId: request?.data.collateralTokenId as nat,
     holderAddress: address as string,
   });
 
   const { data: isApproved } = useCollateralOperator({
     tezos: tezos as TezosToolkit,
-    assetTokenId: data?.data.collateralTokenId as nat,
-    assetContract: data?.data.collateralContract as address,
-    owner: data?.data.borrower as address,
+    assetTokenId: request?.data.collateralTokenId as nat,
+    assetContract: request?.data.collateralContract as address,
+    owner: request?.data.borrower as address,
     operator: contracts?.collateralVault as address,
   });
 
@@ -66,7 +77,7 @@ export default function RequestID() {
     setTransactionStep(TransactionStep.CONFIRMING);
 
     const currencyService = await new CurrencyService().setTarget(
-      data?.data.loanDenominationContract as address,
+      request?.data.loanDenominationContract as address,
       tezos as TezosToolkit
     );
     const originationController = await tezos?.wallet.at<OriginationController>(
@@ -80,16 +91,16 @@ export default function RequestID() {
     const operations = [
       currencyService.addOperator({
         tezos: tezos as TezosToolkit,
-        assetContract: data?.data.loanDenominationContract as address,
-        assetTokenId: data?.data.loanDenominationTokenId as nat,
+        assetContract: request?.data.loanDenominationContract as address,
+        assetTokenId: request?.data.loanDenominationTokenId as nat,
         owner: tas.address(address as string),
         operator: tas.address(contracts?.loanCore as string),
       }),
       originationController.methods.originate_loan(tas.nat(requestId as string)),
       currencyService.removeOperator({
         tezos: tezos as TezosToolkit,
-        assetContract: data?.data.loanDenominationContract as address,
-        assetTokenId: data?.data.loanDenominationTokenId as nat,
+        assetContract: request?.data.loanDenominationContract as address,
+        assetTokenId: request?.data.loanDenominationTokenId as nat,
         owner: tas.address(address as string),
         operator: tas.address(contracts?.loanCore as string),
       }),
@@ -153,19 +164,19 @@ export default function RequestID() {
 
             <div className="divide-y divide-gray-200 flex justify-center">
               <div className="py-6">
-                <img src={data?.data.imageUrl} />
+                <img src={request?.data.imageUrl} />
               </div>
             </div>
 
             <dl className="hidden text-sm font-medium text-gray-900 space-y-6 border-t border-gray-200 pt-6 lg:block">
               <div className="flex items-center justify-between">
                 <dt className="text-gray-600">Name</dt>
-                <dd>{data?.data.collateralName}</dd>
+                <dd>{request?.data.collateralName}</dd>
               </div>
 
               <div className="flex items-center justify-between">
                 <dt className="text-gray-600">Platform</dt>
-                <dd>{data?.data.platformName}</dd>
+                <dd>{request?.data.platformName}</dd>
               </div>
 
               <div className="flex items-center justify-between border-t border-gray-200 pt-6"></div>
@@ -184,20 +195,20 @@ export default function RequestID() {
                 {[
                   {
                     title: 'Borrower',
-                    content: `${shortenAddress(data?.data.borrower ?? '')}`,
+                    content: `${shortenAddress(request?.data.borrower ?? '')}`,
                   },
                   {
                     title: 'Loan Amount',
-                    content: `${data?.data.loanPrincipalAmount} ${data?.data.loanCurrency}`,
+                    content: `${request?.data.loanPrincipalAmount} ${request?.data.loanCurrency}`,
                   },
 
                   {
                     title: 'Loan Interest',
-                    content: `${data?.data.interestAmount} ${data?.data.loanCurrency} `,
+                    content: `${request?.data.interestAmount} ${request?.data.loanCurrency} `,
                   },
                   {
                     title: 'Loan Duration',
-                    content: `${data?.data.loanDuration} days`,
+                    content: `${request?.data.loanDuration} days`,
                   },
                 ].map((item, index) => (
                   <div
@@ -214,8 +225,8 @@ export default function RequestID() {
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left ">
                 {currencyBalance &&
-                data?.data.loanPrincipalAmount &&
-                currencyBalance.gte(data.data.loanPrincipalAmount) ? (
+                request?.data.loanPrincipalAmount &&
+                currencyBalance.gte(request.data.loanPrincipalAmount) ? (
                   <div className="flex">
                     <BadgeCheckIcon className="h-5 w-5 text-green-500" /> &nbsp; Your balance is
                     sufficient
@@ -228,7 +239,7 @@ export default function RequestID() {
                 )}
               </div>
               <div className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left ">
-                {data?.data.borrower === collateralOwner ? (
+                {request.data.borrower === collateralOwner ? (
                   <div className="flex">
                     <BadgeCheckIcon className="h-5 w-5 text-green-500" /> &nbsp; The collateral is
                     owned by the borrower.
