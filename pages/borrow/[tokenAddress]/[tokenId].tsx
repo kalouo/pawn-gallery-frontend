@@ -13,6 +13,8 @@ import Loader from 'components/Loader';
 import NFTService from 'token-service/nft';
 import { ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito';
 import { useWeb3 } from 'hooks/useWeb3';
+import BigNumber from 'bignumber.js';
+import { OriginationController } from 'contract-types';
 
 interface IFormInputs {
   loanAmount: number;
@@ -59,7 +61,7 @@ export default function Example() {
 
   const onSubmit = async (data: IFormInputs) => {
     setTransactionStep(TransactionStep.CONFIRMING);
-    const originationController = await tezos?.wallet.at(
+    const originationController = await tezos?.wallet.at<OriginationController>(
       contracts?.originationController as string
     );
 
@@ -71,6 +73,14 @@ export default function Example() {
     const loanInterest = data.loanInterest; //TODO: handle decimals
     const loanDurationDays = data.loanDurationDays;
     const loanCurrency = currencies?.find((item) => item.symbol === data.loanCurrency);
+
+    if (!loanCurrency) {
+      throw Error('Currency not found');
+    }
+
+    const exponent = new BigNumber(10).exponentiatedBy(loanCurrency.decimals);
+    const decimalLoanAmount = new BigNumber(loanAmount).multipliedBy(exponent);
+    const decimalLoanInterest = new BigNumber(loanInterest).multipliedBy(exponent);
 
     const nftService = await new NFTService().setTarget(
       tas.address(tokenAddress as string),
@@ -88,11 +98,11 @@ export default function Example() {
       originationController.methods.create_request(
         tas.address(tokenAddress as string),
         tas.nat(tokenId as string),
-        tas.nat(loanInterest),
+        tas.nat(decimalLoanInterest),
         tas.address(loanCurrency?.address as string),
         tas.nat(loanCurrency?.tokenId as number),
         tas.int(loanDurationDays),
-        tas.nat(loanAmount),
+        tas.nat(decimalLoanAmount),
         false
       ),
     ];

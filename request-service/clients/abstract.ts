@@ -32,11 +32,11 @@ export interface IRequestService {
       collateralContract: address;
       collateralTokenId: nat;
       borrower: address;
-      interestAmount: nat;
+      interestAmount: string;
       loanDenominationContract: address;
       loanDenominationTokenId: nat;
       loanDuration: int;
-      loanPrincipalAmount: nat;
+      loanPrincipalAmount: string;
       imageUrl: string;
       collateralName: string;
       platformName: string;
