@@ -1,9 +1,13 @@
 import { TezosToolkit } from '@taquito/taquito';
-import { Contracts } from 'contexts/tezos/types';
+import { Contracts, Currency } from 'contexts/tezos/types';
 import { address, int, nat } from 'types/type-aliases';
 
 export interface IRequestService {
-  getLiveRequests(args: { tezos: TezosToolkit; contracts: Contracts }): Promise<{
+  getLiveRequests(args: {
+    tezos: TezosToolkit;
+    contracts: Contracts;
+    currencies: Currency[];
+  }): Promise<{
     data: {
       requestId: number;
       imageUrl: string;
@@ -18,7 +22,12 @@ export interface IRequestService {
     isError: Error | null;
   }>;
 
-  getRequestById(args: { tezos: TezosToolkit; contracts: Contracts; requestId: nat }): Promise<{
+  getRequestById(args: {
+    tezos: TezosToolkit;
+    contracts: Contracts;
+    requestId: nat;
+    currencies: Currency[];
+  }): Promise<{
     data: {
       collateralContract: address;
       collateralTokenId: nat;

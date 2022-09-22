@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useTezosContext } from 'contexts/tezos';
 import { useRequest } from 'hooks/useRequest';
 import { TezosToolkit } from '@taquito/taquito';
-import { Contracts } from 'contexts/tezos/types';
+import { Contracts, Currency } from 'contexts/tezos/types';
 import { useState } from 'react';
 import Loader from 'components/Loader';
 import { shortenAddress } from 'utils/address';
@@ -17,7 +17,7 @@ import { OriginationController } from 'contract-types';
 import { ExclamationCircleIcon, BadgeCheckIcon } from '@heroicons/react/solid';
 
 export default function RequestID() {
-  const { contracts, tezos } = useTezosContext();
+  const { contracts, tezos, currencies } = useTezosContext();
   const { address } = useWeb3();
 
   const router = useRouter();
@@ -27,6 +27,7 @@ export default function RequestID() {
     requestId: requestId as string,
     tezos: tezos as TezosToolkit,
     contracts: contracts as Contracts,
+    currencies: currencies as Currency[],
   });
 
   const { data: currencyBalance } = useCurrencyBalance({

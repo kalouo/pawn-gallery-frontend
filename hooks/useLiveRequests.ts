@@ -1,14 +1,16 @@
 import { TezosToolkit } from '@taquito/taquito';
-import { Contracts } from 'contexts/tezos/types';
+import { Contracts, Currency } from 'contexts/tezos/types';
 import RequestService from 'request-service';
 import useSWR from 'swr';
 
 export const useLiveRequests = ({
   tezos,
   contracts,
+  currencies,
 }: {
   tezos: TezosToolkit;
   contracts: Contracts;
+  currencies: Currency[];
 }) => {
-  return useSWR([{ tezos, contracts }], RequestService.getLiveRequests);
+  return useSWR([{ tezos, contracts, currencies }], RequestService.getLiveRequests);
 };

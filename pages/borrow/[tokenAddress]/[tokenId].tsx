@@ -67,8 +67,8 @@ export default function Example() {
       throw Error('Failed to set origination controller.');
     }
 
-    const loanAmount = data.loanAmount;
-    const loanInterest = data.loanInterest;
+    const loanAmount = data.loanAmount; //TODO: handle decimals
+    const loanInterest = data.loanInterest; //TODO: handle decimals
     const loanDurationDays = data.loanDurationDays;
     const loanCurrency = currencies?.find((item) => item.symbol === data.loanCurrency);
 

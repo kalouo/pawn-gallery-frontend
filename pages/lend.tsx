@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { NextPage } from 'next';
 import { TezosToolkit } from '@taquito/taquito';
 
-import { Contracts } from 'contexts/tezos/types';
+import { Contracts, Currency } from 'contexts/tezos/types';
 import { useLiveRequests } from 'hooks/useLiveRequests';
 import { useTezosContext } from 'contexts/tezos';
 import { useWeb3 } from 'hooks/useWeb3';
@@ -11,11 +11,12 @@ import PleaseConnect from 'components/PleaseConnect';
 import Tabs from 'components/Tabs';
 
 const LiveRequests = ({ address }: { address: string }) => {
-  const { tezos, contracts } = useTezosContext();
+  const { tezos, contracts, currencies } = useTezosContext();
 
   const { data: requests } = useLiveRequests({
     tezos: tezos as TezosToolkit,
     contracts: contracts as Contracts,
+    currencies: currencies as Currency[],
   });
 
   return (

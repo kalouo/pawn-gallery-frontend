@@ -1,6 +1,6 @@
 import { TezosToolkit } from '@taquito/taquito';
 
-import { Contracts } from 'contexts/tezos/types';
+import { Contracts, Currency } from 'contexts/tezos/types';
 import { IRequestService } from './abstract';
 import { nat, tas } from 'types/type-aliases';
 import { OriginationController } from 'contract-types';
@@ -9,10 +9,14 @@ export class SandboxRequestService implements IRequestService {
   public async getLiveRequests({
     tezos,
     contracts,
+    currencies,
   }: {
     tezos: TezosToolkit;
     contracts: Contracts;
+    currencies: Currency[];
   }) {
+    console.log(currencies);
+
     const originationController = await tezos?.wallet.at<OriginationController>(
       contracts?.originationController as string
     );
@@ -27,17 +31,23 @@ export class SandboxRequestService implements IRequestService {
         imageUrl: '/images/test-nft.jpeg',
         collateralName: 'Sandbox NFT',
         platformName: 'Sandbox',
-        loanAmount: item.loan_principal_amount.toString(),
+        loanAmount: item.loan_principal_amount.toString(), // TODO: handle decimals
         loanCurrency: 'sEURL',
         loanDurationDays: item.loan_duration.toString(),
-        interestAmount: item.interest_amount.toString(),
+        interestAmount: item.interest_amount.toString(), // TODO: handle decimals
       })),
       isLoading: false,
       isError: null,
     };
   }
 
-  public async getRequestById(args: { tezos: TezosToolkit; contracts: Contracts; requestId: nat }) {
+  public async getRequestById(args: {
+    tezos: TezosToolkit;
+    contracts: Contracts;
+    currencies: Currency[];
+    requestId: nat;
+  }) {
+    console.log(args.currencies);
     const originationController = await args.tezos?.wallet.at<OriginationController>(
       args.contracts?.originationController as string
     );
@@ -51,11 +61,11 @@ export class SandboxRequestService implements IRequestService {
         collateralContract: result.collateral_contract,
         collateralTokenId: result.collateral_token_id,
         borrower: result.creator,
-        interestAmount: result.interest_amount,
+        interestAmount: result.interest_amount, //TODO: handle decimals
         loanDenominationContract: result.loan_denomination_contract,
         loanDenominationTokenId: result.loan_denomination_token_id,
         loanDuration: result.loan_duration,
-        loanPrincipalAmount: result.loan_principal_amount,
+        loanPrincipalAmount: result.loan_principal_amount, //TODO: handle decimals
         imageUrl: '/images/test-nft.jpeg',
         collateralName: 'Sandbox NFT',
         platformName: 'Sandbox',
