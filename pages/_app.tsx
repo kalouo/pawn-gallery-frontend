@@ -38,7 +38,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         setCurrencies(_currencies);
       }
     })();
-  }, [wallet, tezos, process.env.NEXT_PUBLIC_RPC_URL]);
+  }, [wallet, tezos]);
 
   return (
     <StoreProvider store={store}>

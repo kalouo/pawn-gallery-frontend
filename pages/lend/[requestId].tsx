@@ -7,7 +7,7 @@ import Loader from 'components/Loader';
 import { shortenAddress } from 'utils/address';
 import { useCurrencyBalance } from 'hooks/useCurrencyBalance';
 import { useWeb3 } from 'hooks/useWeb3';
-import { address, nat, tas } from 'types/type-aliases';
+import { address, tas } from 'types/type-aliases';
 import { useCollateralOperator } from 'hooks/useCollateralOperator';
 import { useNFTBalance } from 'hooks/useNFTBalance';
 import CurrencyService from 'token-service/currency';
@@ -259,21 +259,24 @@ export default function RequestID() {
             </section>
 
             <div className="mt-4 pt-4 border-t border-gray-200">
-              {checks.map((i) => (
-                <div className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left ">
-                  {i.loading ? (
+              {checks.map((item, idx) => (
+                <div
+                  className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left"
+                  key={`origination-check-${idx}`}
+                >
+                  {item.loading ? (
                     <Loading size={20}></Loading>
                   ) : (
                     <div className="flex">
-                      {i.condition ? (
+                      {item.condition ? (
                         <>
                           <BadgeCheckIcon className="h-5 w-5 text-green-500" /> &nbsp;{' '}
-                          {i.messageTrue}
+                          {item.messageTrue}
                         </>
                       ) : (
                         <>
                           <ExclamationCircleIcon className="h-5 w-5 text-red-500" />{' '}
-                          {i.messageFalse}
+                          {item.messageFalse}
                         </>
                       )}
                     </div>
