@@ -1,24 +1,19 @@
 import { TezosToolkit } from '@taquito/taquito';
+import { some } from 'lodash';
 import useSWR from 'swr';
 
 import { address, nat } from 'types/type-aliases';
 import NFTService from 'token-service/nft';
 
-export const useCollateralOperator = ({
-  tezos,
-  owner,
-  operator,
-  assetContract,
-  assetTokenId,
-}: {
-  tezos: TezosToolkit;
-  assetContract: address;
-  assetTokenId: nat;
-  owner: string;
-  operator: string;
+export const useCollateralOperator = (args: {
+  tezos: TezosToolkit | undefined;
+  assetContract: address | undefined;
+  assetTokenId: nat | undefined;
+  owner: string | undefined;
+  operator: string | undefined;
 }) => {
   return useSWR(
-    [{ tezos, owner, operator, assetContract, assetTokenId }],
-    new NFTService(assetContract).getOperator
+    some(args, (k) => Boolean(k) === false) ? null : [args],
+    new NFTService(args.assetContract).getOperator
   );
 };

@@ -1,9 +1,7 @@
 import { useRouter } from 'next/router';
-
 import { useTezosContext } from 'contexts/tezos';
 import { useRequest } from 'hooks/useRequest';
 import { TezosToolkit } from '@taquito/taquito';
-import { Contracts, Currency } from 'contexts/tezos/types';
 import { useState } from 'react';
 import Loader from 'components/Loader';
 import { shortenAddress } from 'utils/address';
@@ -16,52 +14,11 @@ import CurrencyService from 'token-service/currency';
 import { OriginationController } from 'contract-types';
 import { ExclamationCircleIcon, BadgeCheckIcon } from '@heroicons/react/solid';
 import Error404 from 'components/404';
+import { Loading } from 'components/Loading';
 
 export default function RequestID() {
   const { contracts, tezos, currencies } = useTezosContext();
   const { address } = useWeb3();
-
-  const router = useRouter();
-
-  const { requestId } = router.query;
-
-  const { data: request } = useRequest({
-    requestId: requestId as string,
-    tezos: tezos as TezosToolkit,
-    contracts: contracts as Contracts,
-    currencies: currencies as Currency[],
-  });
-
-  if (!request?.data) {
-    return (
-      <Error404
-        header="Request not found"
-        subheader="Please check the URL in the address bar and try again."
-      ></Error404>
-    );
-  }
-
-  const { data: currencyBalance } = useCurrencyBalance({
-    tezos: tezos as TezosToolkit,
-    assetTokenId: request?.data.loanDenominationTokenId as nat,
-    assetContract: request?.data.loanDenominationContract as address,
-    holderAddress: address as address,
-  });
-
-  const { data: collateralOwner } = useNFTBalance({
-    tezos: tezos as TezosToolkit,
-    assetContract: request?.data.collateralContract as address,
-    assetTokenId: request?.data.collateralTokenId as nat,
-    holderAddress: address as string,
-  });
-
-  const { data: isApproved } = useCollateralOperator({
-    tezos: tezos as TezosToolkit,
-    assetTokenId: request?.data.collateralTokenId as nat,
-    assetContract: request?.data.collateralContract as address,
-    owner: request?.data.borrower as address,
-    operator: contracts?.collateralVault as address,
-  });
 
   enum TransactionStep {
     NOT_SUBMITTED,
@@ -73,44 +30,93 @@ export default function RequestID() {
     TransactionStep.NOT_SUBMITTED
   );
 
+  const router = useRouter();
+
+  const { requestId } = router.query;
+
+  const { data: request, error } = useRequest({
+    requestId: requestId as string | undefined,
+    tezos: tezos,
+    contracts: contracts,
+    currencies: currencies,
+  });
+
+  const { data: currencyBalance } = useCurrencyBalance({
+    tezos: tezos as TezosToolkit,
+    assetTokenId: request?.data?.loanDenominationTokenId,
+    assetContract: request?.data?.loanDenominationContract,
+    holderAddress: address,
+  });
+
+  const { data: collateralOwner } = useNFTBalance({
+    tezos: tezos as TezosToolkit,
+    assetContract: request?.data?.collateralContract,
+    assetTokenId: request?.data?.collateralTokenId,
+    holderAddress: address,
+  });
+
+  const { data: operatorApproved } = useCollateralOperator({
+    tezos: tezos as TezosToolkit,
+    assetTokenId: request?.data?.collateralTokenId,
+    assetContract: request?.data?.collateralContract,
+    owner: request?.data?.borrower,
+    operator: contracts?.collateralVault,
+  });
+
+  if (error) return <Error404 header="Failed to load" subheader="Please try again."></Error404>;
+
+  if (!request)
+    return (
+      <div className="min-h-full py-16 sm:px-6 sm:py-24 grid place-items-center lg:px-8">
+        <Loading size={180} />
+      </div>
+    );
+
   const handleSubmit = async () => {
     setTransactionStep(TransactionStep.CONFIRMING);
 
-    const currencyService = await new CurrencyService().setTarget(
-      request?.data.loanDenominationContract as address,
-      tezos as TezosToolkit
-    );
-    const originationController = await tezos?.wallet.at<OriginationController>(
-      contracts?.originationController as string
-    );
+    if (request && request.data) {
+      const currencyService = await new CurrencyService().setTarget(
+        request.data.loanDenominationContract as address,
+        tezos as TezosToolkit
+      );
+      const originationController = await tezos?.wallet.at<OriginationController>(
+        contracts?.originationController as string
+      );
 
-    if (!originationController) {
-      throw Error('Failed to set origination controller.');
+      if (!originationController) {
+        throw Error('Failed to set origination controller.');
+      }
+
+      const operations = [
+        currencyService.addOperator({
+          tezos: tezos as TezosToolkit,
+          assetContract: request?.data.loanDenominationContract,
+          assetTokenId: request?.data.loanDenominationTokenId,
+          owner: tas.address(address as string),
+          operator: tas.address(contracts?.loanCore as string),
+        }),
+        originationController.methods.originate_loan(tas.nat(requestId as string)),
+        request &&
+          request.data &&
+          currencyService &&
+          currencyService.removeOperator({
+            tezos: tezos as TezosToolkit,
+            assetContract: request?.data.loanDenominationContract,
+            assetTokenId: request?.data.loanDenominationTokenId,
+            owner: tas.address(address as string),
+            operator: tas.address(contracts?.loanCore as string),
+          }),
+      ];
+
+      const batch = operations.reduce((acc, i) => acc?.withContractCall(i), tezos?.wallet.batch());
+      const op = await batch?.send();
+      await op?.confirmation(1);
+
+      setTransactionStep(TransactionStep.CONFIRMED);
+
+      setTimeout(() => router.push('/lend'), 3000);
     }
-
-    const operations = [
-      currencyService.addOperator({
-        tezos: tezos as TezosToolkit,
-        assetContract: request?.data.loanDenominationContract as address,
-        assetTokenId: request?.data.loanDenominationTokenId as nat,
-        owner: tas.address(address as string),
-        operator: tas.address(contracts?.loanCore as string),
-      }),
-      originationController.methods.originate_loan(tas.nat(requestId as string)),
-      currencyService.removeOperator({
-        tezos: tezos as TezosToolkit,
-        assetContract: request?.data.loanDenominationContract as address,
-        assetTokenId: request?.data.loanDenominationTokenId as nat,
-        owner: tas.address(address as string),
-        operator: tas.address(contracts?.loanCore as string),
-      }),
-    ];
-
-    const batch = operations.reduce((acc, i) => acc?.withContractCall(i), tezos?.wallet.batch());
-    const op = await batch?.send();
-    await op?.confirmation(1);
-
-    setTransactionStep(TransactionStep.CONFIRMED);
   };
 
   const renderButton = () => {
@@ -143,6 +149,36 @@ export default function RequestID() {
       }
     }
   };
+
+  if (!request?.data) {
+    return (
+      <Error404
+        header="Request not found"
+        subheader="Please check the URL in the address bar and try again."
+      ></Error404>
+    );
+  }
+
+  const checks = [
+    {
+      loading: !currencyBalance,
+      condition: currencyBalance?.gte(request.data.loanPrincipalAmount),
+      messageTrue: 'Your balance is sufficient',
+      messageFalse: 'Your balance is NOT sufficient',
+    },
+    {
+      loading: !collateralOwner,
+      condition: request.data.borrower === collateralOwner,
+      messageTrue: 'The collateral is owned by the borrower.',
+      messageFalse: 'The collateral is NOT owned by the borrower.',
+    },
+    {
+      loading: operatorApproved === undefined,
+      condition: operatorApproved,
+      messageTrue: 'The collateral is approved for transfer to the escrow.',
+      messageFalse: 'The collateral is NOT approved for transfer to the escrow.',
+    },
+  ];
 
   return (
     <div className="bg-white">
@@ -223,47 +259,27 @@ export default function RequestID() {
             </section>
 
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left ">
-                {currencyBalance &&
-                request?.data.loanPrincipalAmount &&
-                currencyBalance.gte(request.data.loanPrincipalAmount) ? (
-                  <div className="flex">
-                    <BadgeCheckIcon className="h-5 w-5 text-green-500" /> &nbsp; Your balance is
-                    sufficient
-                  </div>
-                ) : (
-                  <div className="flex">
-                    <ExclamationCircleIcon className="h-5 w-5 text-red-500" /> &nbsp; Your balance
-                    is not sufficient.
-                  </div>
-                )}
-              </div>
-              <div className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left ">
-                {request.data.borrower === collateralOwner ? (
-                  <div className="flex">
-                    <BadgeCheckIcon className="h-5 w-5 text-green-500" /> &nbsp; The collateral is
-                    owned by the borrower.
-                  </div>
-                ) : (
-                  <div className="flex">
-                    <ExclamationCircleIcon className="h-5 w-5 text-red-500" /> &nbsp; The collateral
-                    is NOT owned by the borrower.
-                  </div>
-                )}
-              </div>
-              <div className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left ">
-                {isApproved ? (
-                  <div className="flex">
-                    <BadgeCheckIcon className="h-5 w-5 text-green-500" /> &nbsp; The collateral is
-                    approved for transfer to the escrow.
-                  </div>
-                ) : (
-                  <div className="flex">
-                    <ExclamationCircleIcon className="h-5 w-5 text-red-500" /> &nbsp; The collateral
-                    is NOT approved for transfer to the escrow.
-                  </div>
-                )}
-              </div>
+              {checks.map((i) => (
+                <div className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left ">
+                  {i.loading ? (
+                    <Loading size={20}></Loading>
+                  ) : (
+                    <div className="flex">
+                      {i.condition ? (
+                        <>
+                          <BadgeCheckIcon className="h-5 w-5 text-green-500" /> &nbsp;{' '}
+                          {i.messageTrue}
+                        </>
+                      ) : (
+                        <>
+                          <ExclamationCircleIcon className="h-5 w-5 text-red-500" />{' '}
+                          {i.messageFalse}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
 
             <div className="mt-4 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">

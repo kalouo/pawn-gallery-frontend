@@ -1,22 +1,18 @@
 import { TezosToolkit } from '@taquito/taquito';
+import { some } from 'lodash';
 import useSWR from 'swr';
 
 import { address, nat } from 'types/type-aliases';
 import NFTService from 'token-service/nft';
 
-export const useNFTBalance = ({
-  tezos,
-  holderAddress,
-  assetContract,
-  assetTokenId,
-}: {
-  tezos: TezosToolkit;
-  assetContract: address;
-  assetTokenId: nat;
-  holderAddress: string;
+export const useNFTBalance = (args: {
+  tezos: TezosToolkit | undefined;
+  assetContract: address | undefined;
+  assetTokenId: nat | undefined;
+  holderAddress: string | undefined;
 }) => {
   return useSWR(
-    [{ tezos, holderAddress, assetContract, assetTokenId }],
-    new NFTService(assetContract).getBalance
+    some(args, (k) => Boolean(k) === false) ? null : [args],
+    new NFTService(args.assetContract).getBalance
   );
 };
